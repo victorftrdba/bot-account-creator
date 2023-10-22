@@ -112,8 +112,8 @@ async function createAccountsWithSelenium(username) {
   await confirmRegistrationButtonEl.click();
 
   const { deposit10ButtonEl, rechargeButtonEl } = await findDeposit10Button(driver);
-  await deposit10ButtonEl.click();
-  await rechargeButtonEl.click();
+  await driver.executeScript("arguments[0].click();", deposit10ButtonEl);
+  await driver.executeScript("arguments[0].click();", rechargeButtonEl);
   await driver.manage().window().minimize();
 }
 
