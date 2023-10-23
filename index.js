@@ -25,6 +25,8 @@ const rechargeButtonClass = "div > div.ant-modal-wrap.ant-modal-centered > div >
 const confirmModalClass = "ant-modal-confirm-centered"
 const confirmRegistrationClass = "div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary"
 const passwordValue = 'Quiqui45$'
+const modalInfoClass = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div"
+const closeModalInfoClass = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div > i"
 
 const findModal = async (driver) => {
   await driver.wait(until.elementLocated(By.css(modalClass)));
@@ -67,6 +69,18 @@ const findConfirmModal = async (driver) => {
   await driver.wait(until.elementLocated(By.className(confirmModalClass)));
   const confirmModalEl = await driver.findElement(By.className(confirmModalClass));
   return confirmModalEl
+}
+
+const findModalInfo = async (driver) => {
+  await driver.wait(until.elementLocated(By.css(modalInfoClass)));
+  const modalInfoEl = await driver.findElement(By.css(modalInfoClass));
+  return modalInfoEl
+}
+
+const findCloseModalInfo = async (driver) => {
+  await driver.wait(until.elementLocated(By.css(closeModalInfoClass)), 10000);
+  const closeModalInfoEl = await driver.findElement(By.css(closeModalInfoClass));
+  return closeModalInfoEl
 }
 
 const findConfirmRegistrationButton = async (driver) => {
@@ -112,8 +126,17 @@ async function createAccountsWithSelenium(username) {
   await confirmRegistrationButtonEl.click();
 
   const { deposit10ButtonEl, rechargeButtonEl } = await findDeposit10Button(driver);
+
+  await findModalInfo(driver)
+
+  const closeModalInfoEl = await findCloseModalInfo(driver)
+  if (closeModalInfoEl) {
+    await driver.executeScript("arguments[0].click();", closeModalInfoEl);
+  }
+
   await driver.executeScript("arguments[0].click();", deposit10ButtonEl);
   await driver.executeScript("arguments[0].click();", rechargeButtonEl);
+
   await driver.manage().window().minimize();
 }
 
