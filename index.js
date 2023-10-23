@@ -80,7 +80,7 @@ const findModalInfo = async (driver) => {
 }
 
 const findCloseModalInfo = async (driver) => {
-  await driver.wait(until.elementLocated(By.css(closeModalInfoClass)), 10000);
+  await driver.wait(until.elementLocated(By.css(closeModalInfoClass)));
   const closeModalInfoEl = await driver.findElement(By.css(closeModalInfoClass));
   return closeModalInfoEl
 }
