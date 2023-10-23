@@ -27,6 +27,8 @@ const confirmRegistrationClass = "div.ant-modal-wrap.ant-modal-centered.ant-moda
 const passwordValue = 'Quiqui45$'
 const modalInfoClass = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div"
 const closeModalInfoClass = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div > i"
+const bonusModalClass = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div > div"
+const closeBonusModalClass = "body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > button > span > i"
 
 const findModal = async (driver) => {
   await driver.wait(until.elementLocated(By.css(modalClass)));
@@ -89,6 +91,32 @@ const findConfirmRegistrationButton = async (driver) => {
   return confirmRegistrationButtonEl
 }
 
+const closeModal = async (driver) => {
+  const closeModalInfoEl = await findCloseModalInfo(driver)
+  if (closeModalInfoEl) {
+    await driver.executeScript("arguments[0].click();", closeModalInfoEl);
+  }
+}
+
+const findBonus10Modal = async (driver) => {
+  await driver.wait(until.elementLocated(By.css(bonusModalClass)));
+  const bonusModalEl = await driver.findElement(By.css(bonusModalClass));
+  return bonusModalEl
+}
+
+const findCloseBonusModal = async (driver) => {
+  await driver.wait(until.elementLocated(By.css(closeBonusModalClass)));
+  const closeBonusModalEl = await driver.findElement(By.css(closeBonusModalClass));
+  return closeBonusModalEl
+}
+
+const closeBonusModal = async (driver) => {
+  const closeBonusModalEl = await findCloseBonusModal(driver)
+  if (closeBonusModalEl) {
+    await driver.executeScript("arguments[0].click();", closeBonusModalEl);
+  }
+}
+
 async function createAccountsWithSelenium(username) {
   const options = new ChromeOptions();
   options.addArguments('--incognito');
@@ -125,18 +153,20 @@ async function createAccountsWithSelenium(username) {
   const confirmRegistrationButtonEl = await findConfirmRegistrationButton(driver)
   await confirmRegistrationButtonEl.click();
 
-  const { deposit10ButtonEl, rechargeButtonEl } = await findDeposit10Button(driver);
-
   await findModalInfo(driver)
+  await closeModal(driver)
 
-  const closeModalInfoEl = await findCloseModalInfo(driver)
-  if (closeModalInfoEl) {
-    await driver.executeScript("arguments[0].click();", closeModalInfoEl);
-  }
-
+  const { deposit10ButtonEl, rechargeButtonEl } = await findDeposit10Button(driver);
   await driver.executeScript("arguments[0].click();", deposit10ButtonEl);
   await driver.executeScript("arguments[0].click();", rechargeButtonEl);
 
+  await driver.navigate().refresh();
+
+  const tabs = await driver.getAllWindowHandles();
+  await driver.switchTo().window(tabs[0]);
+
+  await closeModal(driver)
+  await closeBonusModal(driver)
   await driver.manage().window().minimize();
 }
 
