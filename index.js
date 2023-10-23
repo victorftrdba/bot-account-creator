@@ -167,7 +167,7 @@ async function createAccountsWithSelenium(username) {
 
   await closeModal(driver)
   await closeBonusModal(driver)
-  await driver.manage().window().minimize();
+  // await driver.manage().window().minimize();
 }
 
 (async () => {
