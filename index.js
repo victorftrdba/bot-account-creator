@@ -13,12 +13,12 @@ function handleErrors(e) {
   console.log('error', e)
 }
 
-const url = 'https://hhbet2.com/?id=66079804'
+const url = 'https://qqqbet.com/?id=76955870'
 const modalClass = ".register-modal"
 const userNameXPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[1]/div/div/span/span/input"
 const passwordXPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[2]/div/div/span/span/input"
 const passwordConfirmXPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[3]/div/div/span/span/input"
-// const completeNameXPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[4]/div/div/span/span/input"
+const completeNameXPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[4]/div/div/span/span/input"
 const registerButtonXPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[3]/div/button[2]"
 const deposit10ButtonClass = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div > section > div > ul > li"
 const rechargeButtonClass = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > button"
@@ -40,18 +40,18 @@ const findFormFields = async (driver) => {
   await driver.wait(until.elementLocated(By.xpath(userNameXPath)));
   await driver.wait(until.elementLocated(By.xpath(passwordXPath)));
   await driver.wait(until.elementLocated(By.xpath(passwordConfirmXPath)));
-  // await driver.wait(until.elementLocated(By.xpath(completeNameXPath)));
+  await driver.wait(until.elementLocated(By.xpath(completeNameXPath)));
   await driver.wait(until.elementLocated(By.xpath(registerButtonXPath)));
   const userNameEl = await driver.findElement(By.xpath(userNameXPath));
   const passwordEl = await driver.findElement(By.xpath(passwordXPath));
   const confirmPasswordEl = await driver.findElement(By.xpath(passwordConfirmXPath));
-  // const completeNameEl = await driver.findElement(By.xpath(completeNameXPath));
+  const completeNameEl = await driver.findElement(By.xpath(completeNameXPath));
   const registerButtonEl = await driver.findElement(By.xpath(registerButtonXPath));
   return {
     userNameEl,
     passwordEl,
     confirmPasswordEl,
-    // completeNameEl,
+    completeNameEl,
     registerButtonEl
   }
 }
@@ -138,14 +138,14 @@ async function createAccountsWithSelenium(username) {
     userNameEl,
     passwordEl,
     confirmPasswordEl,
-    // completeNameEl,
+    completeNameEl,
     registerButtonEl
   } = await findFormFields(driver);
 
   await userNameEl.sendKeys(username);
   await passwordEl.sendKeys(passwordValue);
   await confirmPasswordEl.sendKeys(passwordValue);
-  // await completeNameEl.sendKeys(username);
+  await completeNameEl.sendKeys(username);
   await registerButtonEl.click();
 
   await findConfirmModal(driver);
@@ -167,7 +167,7 @@ async function createAccountsWithSelenium(username) {
 
   await closeModal(driver)
   await closeBonusModal(driver)
-  // await driver.manage().window().minimize();
+  await driver.manage().window().minimize();
 }
 
 (async () => {
