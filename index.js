@@ -13,7 +13,7 @@ function handleErrors(e) {
   console.log('error', e)
 }
 
-const url = 'https://qqqbet.com/?id=76955870'
+const url = 'https://boa777.com/?id=31589091'
 const modalClass = ".register-modal"
 const userNameXPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[1]/div/div/span/span/input"
 const passwordXPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[2]/div/div/span/span/input"
@@ -26,8 +26,7 @@ const confirmModalClass = "ant-modal-confirm-centered"
 const confirmRegistrationClass = "div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary"
 const passwordValue = 'Quiqui45$'
 const modalInfoClass = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div"
-const closeModalInfoClass = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div > i"
-const bonusModalClass = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div > div"
+const closeModalInfoClass = "body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div > i"
 const closeBonusModalClass = "body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > button > span > i"
 
 const findModal = async (driver) => {
@@ -98,12 +97,6 @@ const closeModal = async (driver) => {
   }
 }
 
-const findBonus10Modal = async (driver) => {
-  await driver.wait(until.elementLocated(By.css(bonusModalClass)));
-  const bonusModalEl = await driver.findElement(By.css(bonusModalClass));
-  return bonusModalEl
-}
-
 const findCloseBonusModal = async (driver) => {
   await driver.wait(until.elementLocated(By.css(closeBonusModalClass)));
   const closeBonusModalEl = await driver.findElement(By.css(closeBonusModalClass));
@@ -166,7 +159,8 @@ async function createAccountsWithSelenium(username) {
   await driver.switchTo().window(tabs[0]);
 
   await closeModal(driver)
-  await closeBonusModal(driver)
+  await closeModal(driver)
+  // await closeBonusModal(driver)
   await driver.manage().window().minimize();
 }
 
