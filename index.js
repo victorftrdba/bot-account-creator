@@ -13,7 +13,7 @@ function handleErrors(e) {
   console.log('error', e)
 }
 
-const url = 'https://obg777.com/?id=68233201'
+const url = 'https://www.uau777.com/?id=73731592'
 const modalClass = ".register-modal"
 const userNameXPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[1]/div/div/span/span/input"
 const passwordXPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[2]/div/div/span/span/input"
