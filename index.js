@@ -13,39 +13,23 @@ function handleErrors(e) {
   console.log('error', e)
 }
 
-const url = 'https://bis777.com/?id=98398050'
-const modalClass = ".register-modal"
-const userNameXPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[1]/div/div/span/span/input"
-const passwordXPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[2]/div/div/span/span/input"
-const passwordConfirmXPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[3]/div/div/span/span/input"
-const completeNameXPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[4]/div/div/span/span/input"
-const registerButtonXPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[3]/div/button[2]"
-const deposit10ButtonClass = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div > section > div > ul > li"
-const rechargeButtonClass = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > button"
-const confirmModalClass = "ant-modal-confirm-centered"
-const confirmRegistrationClass = "div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary"
-const passwordValue = 'Quiqui45$'
-const modalInfoClass = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div"
-const closeModalInfoClass = "body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div > i"
-const closeBonusModalClass = "body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > button > span > i"
-
 const findModal = async (driver) => {
-  await driver.wait(until.elementLocated(By.css(modalClass)));
-  const modal = await driver.findElement(By.css(modalClass));
+  await driver.wait(until.elementLocated(By.css(".register-modal")));
+  const modal = await driver.findElement(By.css(".register-modal"));
   return modal;
 }
 
 const findFormFields = async (driver) => {
-  await driver.wait(until.elementLocated(By.xpath(userNameXPath)));
-  await driver.wait(until.elementLocated(By.xpath(passwordXPath)));
-  await driver.wait(until.elementLocated(By.xpath(passwordConfirmXPath)));
-  await driver.wait(until.elementLocated(By.xpath(completeNameXPath)));
-  await driver.wait(until.elementLocated(By.xpath(registerButtonXPath)));
-  const userNameEl = await driver.findElement(By.xpath(userNameXPath));
-  const passwordEl = await driver.findElement(By.xpath(passwordXPath));
-  const confirmPasswordEl = await driver.findElement(By.xpath(passwordConfirmXPath));
-  const completeNameEl = await driver.findElement(By.xpath(completeNameXPath));
-  const registerButtonEl = await driver.findElement(By.xpath(registerButtonXPath));
+  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[1]/div/div/span/span/input")));
+  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[2]/div/div/span/span/input")));
+  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[3]/div/div/span/span/input")));
+  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[4]/div/div/span/span/input")));
+  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[3]/div/button[2]")));
+  const userNameEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[1]/div/div/span/span/input"));
+  const passwordEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[2]/div/div/span/span/input"));
+  const confirmPasswordEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[3]/div/div/span/span/input"));
+  const completeNameEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[4]/div/div/span/span/input"));
+  const registerButtonEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[3]/div/button[2]"));
   return {
     userNameEl,
     passwordEl,
@@ -56,10 +40,10 @@ const findFormFields = async (driver) => {
 }
 
 const findDeposit10Button = async (driver) => {
-  await driver.wait(until.elementLocated(By.css(deposit10ButtonClass)));
-  await driver.wait(until.elementLocated(By.css(rechargeButtonClass)));
-  const deposit10ButtonEl = await driver.findElement(By.css(deposit10ButtonClass));
-  const rechargeButtonEl = await driver.findElement(By.css(rechargeButtonClass));
+  await driver.wait(until.elementLocated(By.css("div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div > section > div > ul > li")));
+  await driver.wait(until.elementLocated(By.css("div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > button")));
+  const deposit10ButtonEl = await driver.findElement(By.css("div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div > section > div > ul > li"));
+  const rechargeButtonEl = await driver.findElement(By.css("div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > button"));
   return {
     deposit10ButtonEl,
     rechargeButtonEl
@@ -67,26 +51,26 @@ const findDeposit10Button = async (driver) => {
 }
 
 const findConfirmModal = async (driver) => {
-  await driver.wait(until.elementLocated(By.className(confirmModalClass)));
-  const confirmModalEl = await driver.findElement(By.className(confirmModalClass));
+  await driver.wait(until.elementLocated(By.className("ant-modal-confirm-centered")));
+  const confirmModalEl = await driver.findElement(By.className("ant-modal-confirm-centered"));
   return confirmModalEl
 }
 
 const findModalInfo = async (driver) => {
-  await driver.wait(until.elementLocated(By.css(modalInfoClass)));
-  const modalInfoEl = await driver.findElement(By.css(modalInfoClass));
+  await driver.wait(until.elementLocated(By.css("div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div")));
+  const modalInfoEl = await driver.findElement(By.css("div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div"));
   return modalInfoEl
 }
 
 const findCloseModalInfo = async (driver) => {
-  await driver.wait(until.elementLocated(By.css(closeModalInfoClass)));
-  const closeModalInfoEl = await driver.findElement(By.css(closeModalInfoClass));
+  await driver.wait(until.elementLocated(By.css("body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div > i")));
+  const closeModalInfoEl = await driver.findElement(By.css("body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div > i"));
   return closeModalInfoEl
 }
 
 const findConfirmRegistrationButton = async (driver) => {
-  await driver.wait(until.elementLocated(By.css(confirmRegistrationClass)));
-  const confirmRegistrationButtonEl = await driver.findElement(By.css(confirmRegistrationClass));
+  await driver.wait(until.elementLocated(By.css("div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary")));
+  const confirmRegistrationButtonEl = await driver.findElement(By.css("div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary"));
   return confirmRegistrationButtonEl
 }
 
@@ -98,8 +82,8 @@ const closeModal = async (driver) => {
 }
 
 const findCloseBonusModal = async (driver) => {
-  await driver.wait(until.elementLocated(By.css(closeBonusModalClass)));
-  const closeBonusModalEl = await driver.findElement(By.css(closeBonusModalClass));
+  await driver.wait(until.elementLocated(By.css("body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > button > span > i")));
+  const closeBonusModalEl = await driver.findElement(By.css("body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > button > span > i"));
   return closeBonusModalEl
 }
 
@@ -119,12 +103,12 @@ async function createAccountsWithSelenium(username) {
   options.addArguments('--verbose')
 
   const driver = new Builder()
-    .forBrowser(Browser.CHROME)
     .setChromeOptions(options)
+    .forBrowser(Browser.CHROME)
     .build();
 
   await driver.manage().deleteAllCookies();
-  await driver.get(url);
+  await driver.get('https://bis777.com/?id=98398050');
   await findModal(driver);
   await driver.navigate().refresh();
   const {
@@ -136,8 +120,8 @@ async function createAccountsWithSelenium(username) {
   } = await findFormFields(driver);
 
   await userNameEl.sendKeys(username);
-  await passwordEl.sendKeys(passwordValue);
-  await confirmPasswordEl.sendKeys(passwordValue);
+  await passwordEl.sendKeys('Quiqui45$');
+  await confirmPasswordEl.sendKeys('Quiqui45$');
   await completeNameEl.sendKeys(username);
   await registerButtonEl.click();
 
