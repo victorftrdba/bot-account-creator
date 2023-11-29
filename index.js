@@ -96,11 +96,29 @@ const closeBonusModal = async (driver) => {
 
 async function createAccountsWithSelenium(username) {
   const options = new ChromeOptions();
-  options.addArguments('--incognito');
   options.detachDriver(true);
+  options.addArguments('--incognito');
   options.addArguments('--ignore-certificate-errors')
-  options.addArguments('--disable-gpu')
   options.addArguments('--verbose')
+  options.addArguments('--no-sandbox')
+  options.addArguments('--disable-dev-shm-usage')
+  options.addArguments('--disable-web-security')
+  options.addArguments('--allow-running-insecure-content')
+  options.addArguments('--disable-extensions')
+  options.addArguments('--disable-infobars')
+  options.addArguments('--disable-notifications')
+  options.addArguments('--disable-application-cache')
+  options.addArguments('--disable-xss-auditor')
+  options.addArguments('--disable-setuid-sandbox')
+  options.addArguments('--disable-dev-profile')
+  options.addArguments('--disable-ipc-flooding-protection')
+  options.addArguments('--disable-breakpad')
+  options.addArguments('--disable-hang-monitor')
+  options.addArguments('--no-zygote')
+  options.windowSize({
+    width: 800,
+    height: 600
+  })
 
   const driver = new Builder()
     .setChromeOptions(options)
@@ -145,7 +163,7 @@ async function createAccountsWithSelenium(username) {
   await closeModal(driver)
   await closeModal(driver)
   // await closeBonusModal(driver)
-  await driver.manage().window().minimize();
+  // await driver.manage().window().minimize();
 }
 
 (async () => {
