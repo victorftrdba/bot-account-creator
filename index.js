@@ -126,7 +126,7 @@ async function createAccountsWithSelenium(username) {
     .build();
 
   await driver.manage().deleteAllCookies();
-  await driver.get('https://bis777.com/?id=98398050');
+  await driver.get('https://ele777.com/?id=47120607');
   await findModal(driver);
   await driver.navigate().refresh();
   const {
