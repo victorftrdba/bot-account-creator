@@ -155,6 +155,7 @@ async function createAccountsWithSelenium(username) {
   await driver.executeScript("arguments[0].click();", deposit10ButtonEl);
   await driver.executeScript("arguments[0].click();", rechargeButtonEl);
 
+  await driver.sleep(5000)
   await driver.navigate().refresh();
 
   const tabs = await driver.getAllWindowHandles();
