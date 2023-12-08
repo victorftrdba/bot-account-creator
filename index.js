@@ -40,9 +40,9 @@ const findFormFields = async (driver) => {
 }
 
 const findDeposit10Button = async (driver) => {
-  await driver.wait(until.elementLocated(By.css("div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div > section > div > ul > li")));
+  await driver.wait(until.elementLocated(By.css("div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div > section > div > ul > li:nth-child(2)")));
   await driver.wait(until.elementLocated(By.css("div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > button")));
-  const deposit10ButtonEl = await driver.findElement(By.css("div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div > section > div > ul > li"));
+  const deposit10ButtonEl = await driver.findElement(By.css("div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div > section > div > ul > li:nth-child(2)"));
   const rechargeButtonEl = await driver.findElement(By.css("div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > button"));
   return {
     deposit10ButtonEl,
@@ -126,7 +126,7 @@ async function createAccountsWithSelenium(username) {
     .build();
 
   await driver.manage().deleteAllCookies();
-  await driver.get('https://ele777.com/?id=47120607');
+  await driver.get('https://www.ekkbet.com/?id=41625890');
   await findModal(driver);
   await driver.navigate().refresh();
   const {
@@ -168,7 +168,7 @@ async function createAccountsWithSelenium(username) {
 }
 
 (async () => {
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 20; i++) {
     const username = `${faker
       .internet
       .userName()}${new Date().getTime()}`
