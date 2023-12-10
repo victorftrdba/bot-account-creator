@@ -126,7 +126,7 @@ async function createAccountsWithSelenium(username) {
     .build();
 
   await driver.manage().deleteAllCookies();
-  await driver.get('https://sortudoboy.com/?ic=96018614');
+  await driver.get('https://www.pppjogo.net/?id=78831001');
   await findModal(driver);
   await driver.navigate().refresh();
   const {
