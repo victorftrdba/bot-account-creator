@@ -14,28 +14,31 @@ function handleErrors(e) {
 }
 
 const findModal = async (driver) => {
-  await driver.wait(until.elementLocated(By.css(".register-modal")));
-  const modal = await driver.findElement(By.css(".register-modal"));
+  await driver.wait(until.elementLocated(By.css(".registerModal")));
+  const modal = await driver.findElement(By.css(".registerModal"));
   return modal;
 }
 
 const findFormFields = async (driver) => {
-  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[1]/div/div/span/span/input")));
-  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[2]/div/div/span/span/input")));
-  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[3]/div/div/span/span/input")));
-  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[4]/div/div/span/span/input")));
-  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[3]/div/button[2]")));
-  const userNameEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[1]/div/div/span/span/input"));
-  const passwordEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[2]/div/div/span/span/input"));
-  const confirmPasswordEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[3]/div/div/span/span/input"));
-  const completeNameEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[1]/div/form/div[4]/div/div/span/span/input"));
-  const registerButtonEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div/div[3]/div/div[2]/div[3]/div/button[2]"));
+  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[1]/div/div/span/span/input")));
+  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[2]/div/div/span/span/input")));
+  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[3]/div/div/span/span/input")));
+  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[4]/div/div/span/span/input")));
+  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[3]/div/button[2]")));
+  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[5]/div/div/span/span/input")))
+  const userNameEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[1]/div/div/span/span/input"));
+  const passwordEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[2]/div/div/span/span/input"));
+  const confirmPasswordEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[3]/div/div/span/span/input"));
+  const completeNameEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[4]/div/div/span/span/input"));
+  const registerButtonEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[3]/div/button[2]"));
+  const phoneEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[5]/div/div/span/span/input"))
   return {
     userNameEl,
     passwordEl,
     confirmPasswordEl,
     completeNameEl,
-    registerButtonEl
+    registerButtonEl,
+    phoneEl
   }
 }
 
@@ -126,7 +129,7 @@ async function createAccountsWithSelenium(username) {
     .build();
 
   await driver.manage().deleteAllCookies();
-  await driver.get('https://www.pppjogo.net/?id=78831001');
+  await driver.get('https://www.bet123.game/?id=38414916');
   await findModal(driver);
   await driver.navigate().refresh();
   const {
@@ -134,12 +137,14 @@ async function createAccountsWithSelenium(username) {
     passwordEl,
     confirmPasswordEl,
     completeNameEl,
-    registerButtonEl
+    registerButtonEl,
+    phoneEl
   } = await findFormFields(driver);
 
   await userNameEl.sendKeys(username);
   await passwordEl.sendKeys('Quiqui45$');
   await confirmPasswordEl.sendKeys('Quiqui45$');
+  await phoneEl.sendKeys(faker.string.numeric(9));
   await completeNameEl.sendKeys(username);
   await registerButtonEl.click();
 
