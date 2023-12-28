@@ -144,7 +144,7 @@ async function createAccountsWithSelenium(username) {
   await userNameEl.sendKeys(username);
   await passwordEl.sendKeys('Quiqui45$');
   await confirmPasswordEl.sendKeys('Quiqui45$');
-  await phoneEl.sendKeys(faker.string.numeric(9));
+  await phoneEl.sendKeys(`11${faker.string.numeric(8)}`);
   await completeNameEl.sendKeys(username);
   await registerButtonEl.click();
 
