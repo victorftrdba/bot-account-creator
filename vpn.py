@@ -34,5 +34,4 @@ connect_list = [
     for file in files
     if os.path.isfile(os.path.join(directory_path, file)) and file != "passfile"
 ]
-print(files)
-# myvpn = proton_random("connect", connect_list)
+myvpn = proton_random("connect", connect_list)
