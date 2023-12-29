@@ -2,6 +2,7 @@ const { Builder, Browser, By, Key, until } = require('selenium-webdriver');
 const { faker } = require('@faker-js/faker');
 const fs = require('fs');
 const { Options: ChromeOptions } = require('selenium-webdriver/chrome');
+const { exec } = require('child_process');
 const readline = require('readline').createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -13,6 +14,15 @@ function handleErrors(e) {
   console.log('error', e)
 }
 
+const usernamePath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[1]/div/div/span/span/input"
+const passwordPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[2]/div/div/span/span/input"
+const confirmPasswordPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[3]/div/div/span/span/input"
+const completeNamePath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[4]/div/div/span/span/input"
+const registerButtonPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[3]/div/button[2]"
+// const phonePath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[5]/div/div/span/span/input"
+const deposit10Path = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div > section > div > ul > li"
+const rechargePath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > button"
+
 const findModal = async (driver) => {
   await driver.wait(until.elementLocated(By.css(".registerModal")));
   const modal = await driver.findElement(By.css(".registerModal"));
@@ -20,33 +30,33 @@ const findModal = async (driver) => {
 }
 
 const findFormFields = async (driver) => {
-  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[1]/div/div/span/span/input")));
-  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[2]/div/div/span/span/input")));
-  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[3]/div/div/span/span/input")));
-  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[4]/div/div/span/span/input")));
-  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[3]/div/button[2]")));
-  await driver.wait(until.elementLocated(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[5]/div/div/span/span/input")))
-  const userNameEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[1]/div/div/span/span/input"));
-  const passwordEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[2]/div/div/span/span/input"));
-  const confirmPasswordEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[3]/div/div/span/span/input"));
-  const completeNameEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[4]/div/div/span/span/input"));
-  const registerButtonEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[3]/div/button[2]"));
-  const phoneEl = await driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[5]/div/div/span/span/input"))
+  await driver.wait(until.elementLocated(By.xpath(usernamePath)));
+  await driver.wait(until.elementLocated(By.xpath(passwordPath)));
+  await driver.wait(until.elementLocated(By.xpath(confirmPasswordPath)));
+  await driver.wait(until.elementLocated(By.xpath(completeNamePath)));
+  await driver.wait(until.elementLocated(By.xpath(registerButtonPath)));
+  // await driver.wait(until.elementLocated(By.xpath(phonePath)))
+  const userNameEl = await driver.findElement(By.xpath(usernamePath));
+  const passwordEl = await driver.findElement(By.xpath(passwordPath));
+  const confirmPasswordEl = await driver.findElement(By.xpath(confirmPasswordPath));
+  const completeNameEl = await driver.findElement(By.xpath(completeNamePath));
+  const registerButtonEl = await driver.findElement(By.xpath(registerButtonPath));
+  // const phoneEl = await driver.findElement(By.xpath(phonePath))
   return {
     userNameEl,
     passwordEl,
     confirmPasswordEl,
     completeNameEl,
     registerButtonEl,
-    phoneEl
+    // phoneEl
   }
 }
 
 const findDeposit10Button = async (driver) => {
-  await driver.wait(until.elementLocated(By.css("div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div > section > div > ul > li")));
-  await driver.wait(until.elementLocated(By.css("div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > button")));
-  const deposit10ButtonEl = await driver.findElement(By.css("div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div > section > div > ul > li"));
-  const rechargeButtonEl = await driver.findElement(By.css("div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > button"));
+  await driver.wait(until.elementLocated(By.css(deposit10Path)));
+  await driver.wait(until.elementLocated(By.css(rechargePath)));
+  const deposit10ButtonEl = await driver.findElement(By.css(deposit10Path));
+  const rechargeButtonEl = await driver.findElement(By.css(rechargePath));
   return {
     deposit10ButtonEl,
     rechargeButtonEl
@@ -90,12 +100,12 @@ const findCloseBonusModal = async (driver) => {
   return closeBonusModalEl
 }
 
-const closeBonusModal = async (driver) => {
-  const closeBonusModalEl = await findCloseBonusModal(driver)
-  if (closeBonusModalEl) {
-    await driver.executeScript("arguments[0].click();", closeBonusModalEl);
-  }
-}
+// const closeBonusModal = async (driver) => {
+//   const closeBonusModalEl = await findCloseBonusModal(driver)
+//   if (closeBonusModalEl) {
+//     await driver.executeScript("arguments[0].click();", closeBonusModalEl);
+//   }
+// }
 
 async function createAccountsWithSelenium(username) {
   const options = new ChromeOptions();
@@ -138,13 +148,13 @@ async function createAccountsWithSelenium(username) {
     confirmPasswordEl,
     completeNameEl,
     registerButtonEl,
-    phoneEl
+    // phoneEl
   } = await findFormFields(driver);
 
   await userNameEl.sendKeys(username);
   await passwordEl.sendKeys('Quiqui45$');
   await confirmPasswordEl.sendKeys('Quiqui45$');
-  await phoneEl.sendKeys(`11${faker.string.numeric(8)}`);
+  // await phoneEl.sendKeys(`11${faker.string.numeric(8)}`);
   await completeNameEl.sendKeys(username);
   await registerButtonEl.click();
 
@@ -172,7 +182,19 @@ async function createAccountsWithSelenium(username) {
   // await driver.manage().window().minimize();
 }
 
+async function pause() {
+  return await new Promise((resolve) => {
+    setTimeout(() => {
+      resolve()
+    }, 8000)
+  })
+}
+
 (async () => {
+  exec("python ./vpn.py")
+
+  await pause()
+
   for (let i = 0; i < 20; i++) {
     const username = `${faker
       .internet
@@ -183,7 +205,10 @@ async function createAccountsWithSelenium(username) {
 
     try {
       await createAccountsWithSelenium(username)
-      fs.appendFileSync('usuarios.txt', `${username}\n`);
+      if (((i + 1) % 3) === 0) {
+        exec("python ./vpn.py")
+        await pause()
+      }
     } catch (e) {
       console.log('error', e)
     }
