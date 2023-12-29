@@ -29,6 +29,7 @@ def proton_random(action, connect_list=None):
 
 directory_path = r"C:\Program Files\OpenVPN\config"
 files = os.listdir(directory_path)
+# Get VPNs name
 connect_list = [
     file
     for file in files
