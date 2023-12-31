@@ -94,11 +94,11 @@ const closeModal = async (driver) => {
   }
 }
 
-const findCloseBonusModal = async (driver) => {
-  await driver.wait(until.elementLocated(By.css("body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > button > span > i")));
-  const closeBonusModalEl = await driver.findElement(By.css("body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > button > span > i"));
-  return closeBonusModalEl
-}
+// const findCloseBonusModal = async (driver) => {
+//   await driver.wait(until.elementLocated(By.css("body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > button > span > i")));
+//   const closeBonusModalEl = await driver.findElement(By.css("body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > button > span > i"));
+//   return closeBonusModalEl
+// }
 
 // const closeBonusModal = async (driver) => {
 //   const closeBonusModalEl = await findCloseBonusModal(driver)
@@ -139,7 +139,7 @@ async function createAccountsWithSelenium(username) {
     .build();
 
   await driver.manage().deleteAllCookies();
-  await driver.get('https://www.bet123.game/?id=38414916');
+  await driver.get('https://9991bet.com/?id=92920911');
   await findModal(driver);
   await driver.navigate().refresh();
   const {
@@ -176,8 +176,8 @@ async function createAccountsWithSelenium(username) {
   const tabs = await driver.getAllWindowHandles();
   await driver.switchTo().window(tabs[0]);
 
-  await closeModal(driver)
-  await closeModal(driver)
+  // await closeModal(driver)
+  // await closeModal(driver)
   // await closeBonusModal(driver)
   // await driver.manage().window().minimize();
 }
@@ -209,6 +209,7 @@ async function pause() {
         exec("python ./vpn.py")
         await pause()
       }
+      await pause()
     } catch (e) {
       console.log('error', e)
     }
