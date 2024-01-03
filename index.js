@@ -20,7 +20,7 @@ const confirmPasswordPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/
 const completeNamePath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[4]/div/div/span/span/input"
 const registerButtonPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[3]/div/button[2]"
 // const phonePath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[5]/div/div/span/span/input"
-const deposit10Path = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div > section > div > ul > li"
+const deposit10Path = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps.ps--active-y > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div > section > div > div > span > input"
 const rechargePath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > button"
 
 const findModal = async (driver) => {
@@ -94,18 +94,18 @@ const closeModal = async (driver) => {
   }
 }
 
-// const findCloseBonusModal = async (driver) => {
-//   await driver.wait(until.elementLocated(By.css("body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > button > span > i")));
-//   const closeBonusModalEl = await driver.findElement(By.css("body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > button > span > i"));
-//   return closeBonusModalEl
-// }
+const findCloseBonusModal = async (driver) => {
+  await driver.wait(until.elementLocated(By.css("body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > button > span > i")));
+  const closeBonusModalEl = await driver.findElement(By.css("body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > button > span > i"));
+  return closeBonusModalEl
+}
 
-// const closeBonusModal = async (driver) => {
-//   const closeBonusModalEl = await findCloseBonusModal(driver)
-//   if (closeBonusModalEl) {
-//     await driver.executeScript("arguments[0].click();", closeBonusModalEl);
-//   }
-// }
+const closeBonusModal = async (driver) => {
+  const closeBonusModalEl = await findCloseBonusModal(driver)
+  if (closeBonusModalEl) {
+    await driver.executeScript("arguments[0].click();", closeBonusModalEl);
+  }
+}
 
 async function createAccountsWithSelenium(username) {
   const options = new ChromeOptions();
@@ -139,7 +139,7 @@ async function createAccountsWithSelenium(username) {
     .build();
 
   await driver.manage().deleteAllCookies();
-  await driver.get('https://9991bet.com/?id=92920911');
+  await driver.get('https://ukkbet.com/?id=86272102');
   await findModal(driver);
   await driver.navigate().refresh();
   const {
@@ -167,7 +167,8 @@ async function createAccountsWithSelenium(username) {
   await closeModal(driver)
 
   const { deposit10ButtonEl, rechargeButtonEl } = await findDeposit10Button(driver);
-  await driver.executeScript("arguments[0].click();", deposit10ButtonEl);
+  await deposit10ButtonEl.sendKeys('150')
+  //await driver.executeScript("arguments[0].click();", deposit10ButtonEl);
   await driver.executeScript("arguments[0].click();", rechargeButtonEl);
 
   await driver.sleep(5000)
@@ -176,10 +177,9 @@ async function createAccountsWithSelenium(username) {
   const tabs = await driver.getAllWindowHandles();
   await driver.switchTo().window(tabs[0]);
 
-  // await closeModal(driver)
-  // await closeModal(driver)
-  // await closeBonusModal(driver)
-  // await driver.manage().window().minimize();
+  await closeModal(driver)
+  await closeModal(driver)
+  await closeBonusModal(driver)
 }
 
 async function pause() {
@@ -191,11 +191,10 @@ async function pause() {
 }
 
 (async () => {
-  exec("python ./vpn.py")
+  for (let i = 0; i < 10; i++) {
+    exec("python ./vpn.py")
+    await pause()
 
-  await pause()
-
-  for (let i = 0; i < 20; i++) {
     const username = `${faker
       .internet
       .userName()}${new Date().getTime()}`
@@ -205,15 +204,12 @@ async function pause() {
 
     try {
       await createAccountsWithSelenium(username)
-      if (((i + 1) % 3) === 0) {
-        exec("python ./vpn.py")
-        await pause()
-      }
-      await pause()
     } catch (e) {
       console.log('error', e)
     }
   }
+
+  exec("taskkill.exe /F /IM openvpn.exe")
 
   readline.question(`\n\n ******** Pressione Enter para encerrar o script... ********`, () => {
     readline.close();
