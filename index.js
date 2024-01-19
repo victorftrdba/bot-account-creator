@@ -133,7 +133,7 @@ function setOptions(options) {
   })
 }
 
-async function createAccountsWithSelenium(username, moneyValue) {
+async function createAccountsWithSelenium(username) {
   const options = new ChromeOptions();
   setOptions(options)
 
@@ -143,7 +143,7 @@ async function createAccountsWithSelenium(username, moneyValue) {
     .build();
 
   await driver.manage().deleteAllCookies();
-  await driver.get('https://maxxslot.com/?id=55988209');
+  await driver.get('https://9c.game/?id=11198598');
   await findModal(driver);
   await driver.navigate().refresh();
   const {
@@ -171,7 +171,7 @@ async function createAccountsWithSelenium(username, moneyValue) {
   await closeModal(driver)
 
   const { deposit10ButtonEl, rechargeButtonEl } = await findDeposit10Button(driver);
-  await deposit10ButtonEl.sendKeys(String(Number(10 + moneyValue)))
+  await deposit10ButtonEl.sendKeys("10")
   //await driver.executeScript("arguments[0].click();", deposit10ButtonEl);
   await driver.executeScript("arguments[0].click();", rechargeButtonEl);
 
@@ -183,7 +183,8 @@ async function createAccountsWithSelenium(username, moneyValue) {
 
   await closeModal(driver)
   await closeModal(driver)
-  await closeBonusModal(driver)
+  await closeModal(driver)
+  // await closeBonusModal(driver)
 }
 
 async function pause() {
@@ -195,8 +196,6 @@ async function pause() {
 }
 
 (async () => {
-  let moneyValue = 0
-
   for (let i = 0; i < 10; i++) {
     exec("python ./vpn.py")
     await pause()
@@ -209,12 +208,10 @@ async function pause() {
       .substring(0, 12)
 
     try {
-      await createAccountsWithSelenium(username, moneyValue)
+      await createAccountsWithSelenium(username)
     } catch (e) {
       console.log('error', e)
     }
-
-    moneyValue = moneyValue + 1
   }
 
   exec("taskkill.exe /F /IM openvpn.exe")
