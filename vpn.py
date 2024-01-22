@@ -1,14 +1,15 @@
 import os
 import random
 from datetime import datetime
+import sys
 
 
-def proton_random(action, connect_list=None):
+def proton_random(action, connect_list=None, vpn_type=None):
     # Connect
     openvpn_gui_path = r"C:\Program Files\OpenVPN\bin\openvpn-gui.exe"
     os.popen("taskkill.exe /F /IM openvpn.exe").read()
     if connect_list is not None:
-        location = random.choice(connect_list)
+        location = vpn_type if vpn_type is not None else random.choice(connect_list)
         os.popen(f'"{openvpn_gui_path}" --command {action} "{location}"').read()
 
         # Write Log
@@ -35,4 +36,5 @@ connect_list = [
     for file in files
     if os.path.isfile(os.path.join(directory_path, file)) and file != "passfile"
 ]
-myvpn = proton_random("connect", connect_list)
+vpn_type = sys.argv[1] if len(sys.argv) > 1 else None
+myvpn = proton_random("connect", connect_list, vpn_type)

@@ -11,7 +11,7 @@ const readline = require('readline').createInterface({
 process.on('uncaughtException', handleErrors)
 
 function handleErrors(e) {
-  console.log('error', e)
+  //
 }
 
 const usernamePath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[1]/div/div/span/span/input"
@@ -187,6 +187,18 @@ async function createAccountsWithSelenium(username) {
   // await closeBonusModal(driver)
 }
 
+async function askAndDo(pressKey, message, initialMessage) {
+  return await new Promise((resolve) => {
+    console.log(initialMessage)
+    process.stdin.on('keypress', function (ch, key) {
+      if (key.name === pressKey) {
+        console.log(message)
+        resolve()
+      }
+    })
+  })
+}
+
 async function pause() {
   return await new Promise((resolve) => {
     setTimeout(() => {
@@ -212,11 +224,12 @@ async function pause() {
     } catch (e) {
       console.log('error', e)
     }
+
+    exec("taskkill.exe /F /IM openvpn.exe")
+    exec("python ./vpn.py br.protonvpn.udp.ovpn")
+    await askAndDo('a', 'Iniciando criação da próxima conta...', 'Pressione A para continuar a crição de contas')
   }
 
   exec("taskkill.exe /F /IM openvpn.exe")
-
-  readline.question(`\n\n ******** Pressione Enter para encerrar o script... ********`, () => {
-    readline.close();
-  });
+  await askAndDo('return', 'Encerrando o SCRIPT...', 'Pressione ENTER para encerrar o SCRIPT')
 })();
