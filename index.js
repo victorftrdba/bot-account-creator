@@ -1,12 +1,9 @@
-const { Builder, Browser, By, Key, until } = require('selenium-webdriver');
+const { Builder, Browser, By, until } = require('selenium-webdriver');
 const { faker } = require('@faker-js/faker');
-const fs = require('fs');
 const { Options: ChromeOptions } = require('selenium-webdriver/chrome');
 const { exec } = require('child_process');
-const readline = require('readline').createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
+const readline = require('readline');
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
 process.on('uncaughtException', handleErrors)
 
@@ -143,7 +140,7 @@ async function createAccountsWithSelenium(username) {
     .build();
 
   await driver.manage().deleteAllCookies();
-  await driver.get('https://9c.game/?id=11198598');
+  await driver.get('https://www.8c.game/?id=71126799');
   await findModal(driver);
   await driver.navigate().refresh();
   const {
@@ -184,7 +181,7 @@ async function createAccountsWithSelenium(username) {
   await closeModal(driver)
   await closeModal(driver)
   await closeModal(driver)
-  // await closeBonusModal(driver)
+  await closeBonusModal(driver)
 }
 
 async function askAndDo(pressKey, message, initialMessage) {
@@ -214,9 +211,9 @@ async function pause() {
 
     const username = `${faker
       .internet
-      .userName()}${new Date().getTime()}`
-      .replace('.', '2023')
-      .replace('_', '2021')
+      .displayName()}`
+      .replace('.', new Date().getTime())
+      .replace('_', new Date().getTime())
       .substring(0, 12)
 
     try {
@@ -225,11 +222,11 @@ async function pause() {
       console.log('error', e)
     }
 
-    exec("taskkill.exe /F /IM openvpn.exe")
-    exec("python ./vpn.py br.protonvpn.udp.ovpn")
-    await askAndDo('a', 'Iniciando criação da próxima conta...', 'Pressione A para continuar a crição de contas')
+    // exec("taskkill.exe /F /IM openvpn.exe")
+    // exec("python ./vpn.py br.protonvpn.udp.ovpn")
+    // await askAndDo('a', 'Iniciando criação da próxima conta...', 'Pressione A para continuar a crição de contas')
   }
 
   exec("taskkill.exe /F /IM openvpn.exe")
-  await askAndDo('return', 'Encerrando o SCRIPT...', 'Pressione ENTER para encerrar o SCRIPT')
+  rl.question('Encerrar script, aperte ENTER', () => process.exit());
 })();
