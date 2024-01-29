@@ -140,7 +140,7 @@ async function createAccountsWithSelenium(username) {
     .build();
 
   await driver.manage().deleteAllCookies();
-  await driver.get('https://www.8c.game/?id=71126799');
+  await driver.get('https://felizpg.biz/?id=85590967');
   await findModal(driver);
   await driver.navigate().refresh();
   const {
@@ -181,7 +181,7 @@ async function createAccountsWithSelenium(username) {
   await closeModal(driver)
   await closeModal(driver)
   await closeModal(driver)
-  await closeBonusModal(driver)
+  // await closeBonusModal(driver)
 }
 
 async function askAndDo(pressKey, message, initialMessage) {
@@ -211,9 +211,9 @@ async function pause() {
 
     const username = `${faker
       .internet
-      .displayName()}`
-      .replace('.', new Date().getTime())
-      .replace('_', new Date().getTime())
+      .userName()}${new Date().getTime()}`
+      .replace('.', '2023')
+      .replace('_', '2021')
       .substring(0, 12)
 
     try {
