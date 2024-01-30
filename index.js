@@ -140,7 +140,7 @@ async function createAccountsWithSelenium(username) {
     .build();
 
   await driver.manage().deleteAllCookies();
-  await driver.get('https://felizpg.biz/?id=85590967');
+  await driver.get('https://oxe777.com/?id=83822098');
   await findModal(driver);
   await driver.navigate().refresh();
   const {
