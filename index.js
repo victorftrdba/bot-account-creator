@@ -5,20 +5,17 @@ const { exec } = require('child_process');
 const readline = require('readline');
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
-process.on('uncaughtException', handleErrors)
+process.on('uncaughtException', null)
 
-function handleErrors(e) {
-  //
-}
-
-const modalPath = "div.registerModal > div.ant-modal-wrap.ant-modal-centered > div"
-const usernamePath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[1]/div/div/span/span/input"
-const passwordPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[2]/div/div/span/span/input"
-const confirmPasswordPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[3]/div/div/span/span/input"
-const completeNamePath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[4]/div/div/span/span/input"
-const registerButtonPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[3]/div/button[2]"
+const modalPath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div.ant-tabs-content.ant-tabs-content-animated.ant-tabs-top-content > div > div.ant-space.ant-space-vertical > div > div > button.ant-btn.ant-btn-primary.ant-btn-block"
+const usernamePath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div.ant-tabs-content.ant-tabs-content-animated.ant-tabs-top-content > div > div.ant-space.ant-space-vertical > div > div > form > div.ant-row.ant-form-item.base-form-item-platformId > div > div > span > span > input"
+const passwordPath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div.ant-tabs-content.ant-tabs-content-animated.ant-tabs-top-content > div > div.ant-space.ant-space-vertical > div > div > form > div.ant-row.ant-form-item.base-form-item-passwd > div > div > span > span > input"
+const confirmPasswordPath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div.ant-tabs-content.ant-tabs-content-animated.ant-tabs-top-content > div > div.ant-space.ant-space-vertical > div > div > form > div.ant-row.ant-form-item.base-form-item-passwdConfirm > div > div > span > span > input"
+const completeNamePath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div.ant-tabs-content.ant-tabs-content-animated.ant-tabs-top-content > div > div.ant-space.ant-space-vertical > div > div > form > div.ant-row.ant-form-item.base-form-item-realName > div > div > span > span > input"
+const registerButtonPath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div.ant-tabs-content.ant-tabs-content-animated.ant-tabs-top-content > div > div.ant-space.ant-space-vertical > div > div > button.ant-btn.ant-btn-primary.ant-btn-block"
 const deposit10Path = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps.ps--active-y > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div:nth-child(3) > section > div > ul > li:nth-child(1)"
 const rechargePath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > button"
+const closeBonusModalPath = "section > div:nth-child(4) > div > div > div > div > div > span > div"
 // const phonePath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[5]/div/div/span/span/input"
 
 async function findModal(driver) {
@@ -28,18 +25,18 @@ async function findModal(driver) {
 }
 
 async function findFormFields(driver) {
-  await driver.wait(until.elementLocated(By.xpath(usernamePath)));
-  await driver.wait(until.elementLocated(By.xpath(passwordPath)));
-  await driver.wait(until.elementLocated(By.xpath(confirmPasswordPath)));
-  await driver.wait(until.elementLocated(By.xpath(completeNamePath)));
-  await driver.wait(until.elementLocated(By.xpath(registerButtonPath)));
-  // await driver.wait(until.elementLocated(By.xpath(phonePath)))
-  const userNameEl = await driver.findElement(By.xpath(usernamePath));
-  const passwordEl = await driver.findElement(By.xpath(passwordPath));
-  const confirmPasswordEl = await driver.findElement(By.xpath(confirmPasswordPath));
-  const completeNameEl = await driver.findElement(By.xpath(completeNamePath));
-  const registerButtonEl = await driver.findElement(By.xpath(registerButtonPath));
-  // const phoneEl = await driver.findElement(By.xpath(phonePath))
+  await driver.wait(until.elementLocated(By.css(usernamePath)));
+  await driver.wait(until.elementLocated(By.css(passwordPath)));
+  await driver.wait(until.elementLocated(By.css(confirmPasswordPath)));
+  await driver.wait(until.elementLocated(By.css(completeNamePath)));
+  await driver.wait(until.elementLocated(By.css(registerButtonPath)));
+  // await driver.wait(until.elementLocated(By.css(phonePath)))
+  const userNameEl = await driver.findElement(By.css(usernamePath));
+  const passwordEl = await driver.findElement(By.css(passwordPath));
+  const confirmPasswordEl = await driver.findElement(By.css(confirmPasswordPath));
+  const completeNameEl = await driver.findElement(By.css(completeNamePath));
+  const registerButtonEl = await driver.findElement(By.css(registerButtonPath));
+  // const phoneEl = await driver.findElement(By.css(phonePath))
   return {
     userNameEl,
     passwordEl,
@@ -93,8 +90,8 @@ async function closeModal(driver) {
 }
 
 async function findCloseBonusModal(driver) {
-  await driver.wait(until.elementLocated(By.css("body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > button > span > i")));
-  const closeBonusModalEl = await driver.findElement(By.css("body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > button > span > i"));
+  await driver.wait(until.elementLocated(By.css(closeBonusModalPath)));
+  const closeBonusModalEl = await driver.findElement(By.css(closeBonusModalPath));
   return closeBonusModalEl
 }
 
@@ -102,6 +99,9 @@ async function closeBonusModal(driver) {
   const closeBonusModalEl = await findCloseBonusModal(driver)
   if (closeBonusModalEl) {
     await driver.executeScript("arguments[0].click();", closeBonusModalEl);
+    await driver.wait(until.elementLocated(By.css("div > div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary")))
+    const confirmCloseBonusModalEl = await driver.findElement(By.css("div > div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary"))
+    await driver.executeScript("arguments[0].click();", confirmCloseBonusModalEl);
   }
 }
 
@@ -141,7 +141,7 @@ async function createAccountsWithSelenium(username) {
     .build();
 
   await driver.manage().deleteAllCookies();
-  await driver.get('https://oxe777.com/?id=83822098');
+  await driver.get('https://www.775bet.com/?id=55198326');
   await findModal(driver);
   await driver.navigate().refresh();
   const {
@@ -181,7 +181,7 @@ async function createAccountsWithSelenium(username) {
     await closeModal(driver)
   }
 
-  // await closeBonusModal(driver)
+  await closeBonusModal(driver)
 }
 
 async function askAndDo(pressKey, message, initialMessage) {
