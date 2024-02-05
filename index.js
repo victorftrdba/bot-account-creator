@@ -11,18 +11,19 @@ function handleErrors(e) {
   //
 }
 
+const modalPath = "div.registerModal > div.ant-modal-wrap.ant-modal-centered > div"
 const usernamePath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[1]/div/div/span/span/input"
 const passwordPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[2]/div/div/span/span/input"
 const confirmPasswordPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[3]/div/div/span/span/input"
 const completeNamePath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[4]/div/div/span/span/input"
 const registerButtonPath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[3]/div/button[2]"
-// const phonePath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[5]/div/div/span/span/input"
-const deposit10Path = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps.ps--active-y > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div > section > div > div > span > input"
+const deposit10Path = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps.ps--active-y > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div:nth-child(3) > section > div > ul > li:nth-child(1)"
 const rechargePath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > button"
+// const phonePath = "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/div/div/div[3]/div/div[2]/div[1]/div/form/div[5]/div/div/span/span/input"
 
 async function findModal(driver) {
-  await driver.wait(until.elementLocated(By.css(".registerModal")));
-  const modal = await driver.findElement(By.css(".registerModal"));
+  await driver.wait(until.elementLocated(By.css(modalPath)));
+  const modal = await driver.findElement(By.css(modalPath));
   return modal;
 }
 
@@ -155,8 +156,8 @@ async function createAccountsWithSelenium(username) {
   await userNameEl.sendKeys(username);
   await passwordEl.sendKeys('Quiqui45$');
   await confirmPasswordEl.sendKeys('Quiqui45$');
-  // await phoneEl.sendKeys(`11${faker.string.numeric(8)}`);
   await completeNameEl.sendKeys(username);
+  // await phoneEl.sendKeys(`11${faker.string.numeric(8)}`);
   await registerButtonEl.click();
 
   await findConfirmModal(driver);
@@ -168,9 +169,7 @@ async function createAccountsWithSelenium(username) {
   await closeModal(driver)
 
   const { deposit10ButtonEl, rechargeButtonEl } = await findDeposit10Button(driver);
-  await deposit10ButtonEl.sendKeys("10")
-  //await driver.executeScript("arguments[0].click();", deposit10ButtonEl);
-  await driver.executeScript("arguments[0].click();", rechargeButtonEl);
+  [deposit10ButtonEl, rechargeButtonEl].forEach(async (el) => await driver.executeScript("arguments[0].click();", el));
 
   await driver.sleep(5000)
   await driver.navigate().refresh();
@@ -178,9 +177,10 @@ async function createAccountsWithSelenium(username) {
   const tabs = await driver.getAllWindowHandles();
   await driver.switchTo().window(tabs[0]);
 
-  await closeModal(driver)
-  await closeModal(driver)
-  await closeModal(driver)
+  for (let i = 0; i < 3; i++) {
+    await closeModal(driver)
+  }
+
   // await closeBonusModal(driver)
 }
 
@@ -222,7 +222,7 @@ async function pause() {
       console.log('error', e)
     }
 
-    // exec("taskkill.exe /F /IM openvpn.exe")
+    exec("taskkill.exe /F /IM openvpn.exe")
     // exec("python ./vpn.py br.protonvpn.udp.ovpn")
     // await askAndDo('a', 'Iniciando criação da próxima conta...', 'Pressione A para continuar a crição de contas')
   }
