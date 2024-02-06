@@ -7,8 +7,6 @@ const rl = readline.createInterface({ input: process.stdin, output: process.stdo
 
 process.on('uncaughtException', () => { })
 
-const vpnExe = 'protonvpn'
-
 const modalPath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div.ant-tabs-content.ant-tabs-content-animated.ant-tabs-top-content > div > div.ant-space.ant-space-vertical > div > div > button.ant-btn.ant-btn-primary.ant-btn-block"
 const usernamePath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div.ant-tabs-content.ant-tabs-content-animated.ant-tabs-top-content > div > div.ant-space.ant-space-vertical > div > div > form > div.ant-row.ant-form-item.base-form-item-platformId > div > div > span > span > input"
 const passwordPath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div.ant-tabs-content.ant-tabs-content-animated.ant-tabs-top-content > div > div.ant-space.ant-space-vertical > div > div > form > div.ant-row.ant-form-item.base-form-item-passwd > div > div > span > span > input"
@@ -152,8 +150,6 @@ async function createAccountsWithSelenium(username) {
       // phoneEl
     } = await findFormFields(driver);
 
-    openVpn()
-
     await userNameEl.sendKeys(username);
     await passwordEl.sendKeys('Quiqui45$');
     await confirmPasswordEl.sendKeys('Quiqui45$');
@@ -189,19 +185,19 @@ async function createAccountsWithSelenium(username) {
   }
 }
 
-function openVpn() {
-  exec("ipconfig /release")
-  exec("ipconfig /renew")
-  exec("ipconfig /flushdns")
-  exec(`${vpnExe} c -r`)
-}
-
-function disconnectVpn() {
-  exec(`${vpnExe} d`)
-}
+const openVpn = (config) => exec(`python .\\vpn.py${config ? ` ${config}` : ''}`);
+const disconnectVpn = () => exec('taskkill.exe /F /IM openvpn.exe');
+const pause = async () => await new Promise((resolve) => {
+  setTimeout(() => {
+    resolve()
+  }, 8000)
+});
 
 (async () => {
   for (let i = 0; i < 10; i++) {
+    openVpn()
+    await pause()
+
     await createAccountsWithSelenium(
       `${faker
         .internet
@@ -212,6 +208,6 @@ function disconnectVpn() {
     )
   }
 
-  setInterval(() => openVpn('Brazil'), 60000)
+  setInterval(() => openVpn('br.protonvpn.tcp.ovpn'), 60000)
   rl.question('Encerrar script, aperte ENTER', () => process.exit());
 })();
