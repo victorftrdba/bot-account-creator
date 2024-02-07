@@ -15,7 +15,7 @@ const completeNamePath = "div > div.ant-modal-wrap.ant-modal-centered > div > di
 const registerButtonPath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div.ant-tabs-content.ant-tabs-content-animated.ant-tabs-top-content > div > div.ant-space.ant-space-vertical > div > div > button.ant-btn.ant-btn-primary.ant-btn-block"
 const deposit10Path = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps.ps--active-y > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > div:nth-child(3) > section > div > ul > li:nth-child(1)"
 const rechargePath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div.my-scrollbar-wrap.my-scrollbar-wrap-y > div > div > button"
-const closeBonusModalPath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps.ps--active-y > button > span"
+const closeBonusModalPath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > button > span"
 const confirmModalPath = "ant-modal-confirm-centered"
 const modalInfoPath = "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div"
 const closeModalInfoPath = "body > div > div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content.ps > div.ant-modal-body > div > div > div > i"
@@ -150,11 +150,13 @@ async function createAccountsWithSelenium(username) {
       // phoneEl
     } = await findFormFields(driver);
 
-    await userNameEl.sendKeys(username);
-    await passwordEl.sendKeys('Quiqui45$');
-    await confirmPasswordEl.sendKeys('Quiqui45$');
-    await completeNameEl.sendKeys(username);
-    // await phoneEl.sendKeys(`11${faker.string.numeric(8)}`);
+    await Promise.all([
+      userNameEl.sendKeys(username),
+      passwordEl.sendKeys('Quiqui45$'),
+      confirmPasswordEl.sendKeys('Quiqui45$'),
+      completeNameEl.sendKeys(username),
+      // phoneEl.sendKeys(`11${faker.string.numeric(8)}`)
+    ])
     await registerButtonEl.click();
 
     await findConfirmModal(driver);
@@ -180,8 +182,8 @@ async function createAccountsWithSelenium(username) {
 
     await closeBonusModal(driver)
     disconnectVpn()
-  } catch {
-    await createAccountsWithSelenium(username)
+  } catch (e) {
+    if (e.name === 'WebDriverError') await createAccountsWithSelenium(username);
   }
 }
 
@@ -197,7 +199,6 @@ const pause = async () => await new Promise((resolve) => {
   for (let i = 0; i < 10; i++) {
     openVpn()
     await pause()
-
     await createAccountsWithSelenium(
       `${faker
         .internet
