@@ -1,3 +1,5 @@
+process.on('uncaughtException', () => { });
+
 const readline = require('readline');
 const {
   createAccountsWithSelenium,
@@ -14,5 +16,3 @@ const rl = readline.createInterface({ input: process.stdin, output: process.stdo
   // setInterval(() => openVpn('br.protonvpn.tcp.ovpn'), 60000)
   rl.question('Encerrar script, aperte ENTER', () => process.exit());
 })();
-
-process.on('uncaughtException', () => { });
