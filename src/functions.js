@@ -46,7 +46,7 @@ async function createAccountsWithSelenium(username) {
             confirmPasswordEl,
             completeNameEl,
             registerButtonEl,
-            cpfEl,
+            // cpfEl,
             // phoneEl
         } = await findFormFields(driver);
         await Promise.all([
@@ -54,7 +54,7 @@ async function createAccountsWithSelenium(username) {
             passwordEl.sendKeys('Quiqui45$'),
             confirmPasswordEl.sendKeys('Quiqui45$'),
             completeNameEl.sendKeys(username),
-            cpfEl.sendKeys(faker.string.numeric(11)),
+            // cpfEl.sendKeys(faker.string.numeric(11)),
             // phoneEl.sendKeys(`11${faker.string.numeric(8)}`)
         ])
         await registerButtonEl.click();
@@ -74,9 +74,9 @@ async function createAccountsWithSelenium(username) {
         const tabs = await driver.getAllWindowHandles();
         await driver.switchTo().window(tabs[0]);
 
-        // for (let i = 0; i < 3; i++) {
-        //   await closeModal(driver)
-        // }
+        for (let i = 0; i < 2; i++) {
+            await closeModal(driver)
+        }
 
         // await closeBonusModal(driver)
 
@@ -98,14 +98,14 @@ async function findFormFields(driver) {
     await driver.wait(until.elementLocated(By.css(confirmPasswordPath)));
     await driver.wait(until.elementLocated(By.css(completeNamePath)));
     await driver.wait(until.elementLocated(By.css(registerButtonPath)));
-    await driver.wait(until.elementLocated(By.css(cpfPath)));
+    // await driver.wait(until.elementLocated(By.css(cpfPath)));
     // await driver.wait(until.elementLocated(By.css(phonePath)))
     const userNameEl = await driver.findElement(By.css(usernamePath));
     const passwordEl = await driver.findElement(By.css(passwordPath));
     const confirmPasswordEl = await driver.findElement(By.css(confirmPasswordPath));
     const completeNameEl = await driver.findElement(By.css(completeNamePath));
     const registerButtonEl = await driver.findElement(By.css(registerButtonPath));
-    const cpfEl = await driver.findElement(By.css(cpfPath));
+    // const cpfEl = await driver.findElement(By.css(cpfPath));
     // const phoneEl = await driver.findElement(By.css(phonePath))
     return {
         userNameEl,
@@ -113,7 +113,7 @@ async function findFormFields(driver) {
         confirmPasswordEl,
         completeNameEl,
         registerButtonEl,
-        cpfEl,
+        // cpfEl,
         // phoneEl
     }
 }

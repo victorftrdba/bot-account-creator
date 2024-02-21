@@ -1,3 +1,3 @@
 module.exports = {
-    link: 'https://9997bet.net/?id=57415903'
+    link: 'https://viu777.co/?id=64056984'
 };
