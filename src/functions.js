@@ -142,9 +142,13 @@ async function findModalInfo(driver) {
 }
 
 async function findCloseModalInfo(driver) {
-    await driver.wait(until.elementLocated(By.css(closeModalInfoPath)));
-    const closeModalInfoEl = await driver.findElement(By.css(closeModalInfoPath));
-    return closeModalInfoEl
+    try {
+        await driver.wait(until.elementLocated(By.css(closeModalInfoPath)), 10000);
+        const closeModalInfoEl = await driver.findElement(By.css(closeModalInfoPath));
+        return closeModalInfoEl
+    } catch {
+        return null
+    }
 }
 
 async function findConfirmRegistrationButton(driver) {
