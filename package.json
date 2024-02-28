@@ -1,5 +1,5 @@
 {
-  "name": "selenium",
+  "name": "bot-account-creator",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "collect.js": "^4.36.1",
+    "readline-sync": "^1.4.10",
     "selenium-webdriver": "^4.14.0"
   },
   "devDependencies": {

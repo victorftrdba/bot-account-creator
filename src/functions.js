@@ -19,9 +19,8 @@ const {
     confirmRegistrationButtonPath
     // phonePath
 } = require('./paths.js')
-const { link } = require('./config.js');
 
-async function createAccountsWithSelenium(username) {
+async function createAccountsWithSelenium(username, link, isWithCpf) {
     try {
         disconnectVpn()
         openVpn()
@@ -40,24 +39,41 @@ async function createAccountsWithSelenium(username) {
         await findModal(driver);
         await driver.navigate().refresh();
 
-        const {
-            userNameEl,
-            passwordEl,
-            confirmPasswordEl,
-            completeNameEl,
-            registerButtonEl,
-            // cpfEl,
-            // phoneEl
-        } = await findFormFields(driver);
-        await Promise.all([
-            userNameEl.sendKeys(username),
-            passwordEl.sendKeys('Quiqui45$'),
-            confirmPasswordEl.sendKeys('Quiqui45$'),
-            completeNameEl.sendKeys(username),
-            // cpfEl.sendKeys(faker.string.numeric(11)),
-            // phoneEl.sendKeys(`11${faker.string.numeric(8)}`)
-        ])
-        await registerButtonEl.click();
+        let registerButton = null;
+        if (isWithCpf === true) {
+            const {
+                userNameEl,
+                passwordEl,
+                confirmPasswordEl,
+                completeNameEl,
+                registerButtonEl,
+                cpfEl,
+            } = await findFormFields(driver, true);
+            await Promise.all([
+                userNameEl.sendKeys(username),
+                passwordEl.sendKeys('Quiqui45$'),
+                confirmPasswordEl.sendKeys('Quiqui45$'),
+                completeNameEl.sendKeys(username),
+                cpfEl.sendKeys(faker.string.numeric(11)),
+            ])
+            registerButton = registerButtonEl
+        } else {
+            const {
+                userNameEl,
+                passwordEl,
+                confirmPasswordEl,
+                completeNameEl,
+                registerButtonEl,
+            } = await findFormFields(driver, false);
+            await Promise.all([
+                userNameEl.sendKeys(username),
+                passwordEl.sendKeys('Quiqui45$'),
+                confirmPasswordEl.sendKeys('Quiqui45$'),
+                completeNameEl.sendKeys(username),
+            ])
+            registerButton = registerButtonEl
+        }
+        await registerButton?.click?.();
 
         await findConfirmModal(driver);
         const confirmRegistrationButtonEl = await findConfirmRegistrationButton(driver)
@@ -82,7 +98,7 @@ async function createAccountsWithSelenium(username) {
 
         disconnectVpn()
     } catch (e) {
-        await createAccountsWithSelenium(generateName());
+        await createAccountsWithSelenium(generateName(), link, isWithCpf);
     }
 };
 
@@ -92,29 +108,29 @@ async function findModal(driver) {
     return modal;
 }
 
-async function findFormFields(driver) {
+async function findFormFields(driver, isWithCpf) {
+    let cpfEl = null;
     await driver.wait(until.elementLocated(By.css(usernamePath)));
     await driver.wait(until.elementLocated(By.css(passwordPath)));
     await driver.wait(until.elementLocated(By.css(confirmPasswordPath)));
     await driver.wait(until.elementLocated(By.css(completeNamePath)));
     await driver.wait(until.elementLocated(By.css(registerButtonPath)));
-    // await driver.wait(until.elementLocated(By.css(cpfPath)));
-    // await driver.wait(until.elementLocated(By.css(phonePath)))
+    if (isWithCpf) await driver.wait(until.elementLocated(By.css(cpfPath)));
     const userNameEl = await driver.findElement(By.css(usernamePath));
     const passwordEl = await driver.findElement(By.css(passwordPath));
     const confirmPasswordEl = await driver.findElement(By.css(confirmPasswordPath));
     const completeNameEl = await driver.findElement(By.css(completeNamePath));
     const registerButtonEl = await driver.findElement(By.css(registerButtonPath));
-    // const cpfEl = await driver.findElement(By.css(cpfPath));
-    // const phoneEl = await driver.findElement(By.css(phonePath))
+    if (isWithCpf) {
+        cpfEl = await driver.findElement(By.css(cpfPath));
+    }
     return {
         userNameEl,
         passwordEl,
         confirmPasswordEl,
         completeNameEl,
         registerButtonEl,
-        // cpfEl,
-        // phoneEl
+        cpfEl,
     }
 }
 
