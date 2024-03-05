@@ -20,10 +20,12 @@ const {
     // phonePath
 } = require('./paths.js')
 
-async function createAccountsWithSelenium(username, link, isWithCpf) {
+async function createAccountsWithSelenium(username, link, isWithCpf, changeVpn = false) {
     try {
-        disconnectVpn()
-        openVpn()
+        if (changeVpn === true) {
+            disconnectVpn()
+            openVpn()
+        }
         await pause()
 
         const options = new ChromeOptions();
@@ -96,9 +98,11 @@ async function createAccountsWithSelenium(username, link, isWithCpf) {
 
         // await closeBonusModal(driver)
 
-        disconnectVpn()
+        if (changeVpn === true) {
+            disconnectVpn()
+        }
     } catch (e) {
-        await createAccountsWithSelenium(generateName(), link, isWithCpf);
+        await createAccountsWithSelenium(generateName(), link, isWithCpf, true);
     }
 };
 
