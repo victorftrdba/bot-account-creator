@@ -26,28 +26,17 @@ const rlSync = require('readline-sync');
     falseValue: 'n'
   })
 
-  const isCreateDouble = rlSync.question('Deseja criar o dobro de contas? (s/n)\n', {
-    hideEchoBack: false,
-    trueValue: 's',
-    falseValue: 'n'
-  })
-
   const quantities = rlSync.question('Quantas contas deseja criar? (1-30) - O número selecionado deve ser considerado sempre o dobro (1 = 2, 10 = 20)\n', {
     hideEchoBack: false,
   })
 
   console.log(`Iniciando criação de contas para ${link} ${isWithCpf ? 'com CPF' : 'sem CPF'}`)
 
+  const promises = []
   for (let i = 0; i < Number(quantities); i++) {
-    if (isCreateDouble === true) {
-      await Promise.all([
-        createAccountsWithSelenium(generateName(), link, isWithCpf, true),
-        createAccountsWithSelenium(generateName(), link, isWithCpf),
-      ])
-    } else {
-      await createAccountsWithSelenium(generateName(), link, isWithCpf, true);
-    }
+    promises.push(createAccountsWithSelenium(generateName(), link, isWithCpf))
   }
+  await Promise.all(promises)
 
   // setInterval(() => openVpn('br.protonvpn.tcp.ovpn'), 60000)
   rlSync.question('Encerrar script, aperte ENTER');

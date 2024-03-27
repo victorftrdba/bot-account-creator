@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "collect.js": "^4.36.1",
+    "proxy-chain": "^2.4.0",
     "readline-sync": "^1.4.10",
     "selenium-webdriver": "^4.14.0"
   },

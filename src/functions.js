@@ -19,17 +19,15 @@ const {
     confirmRegistrationButtonPath
     // phonePath
 } = require('./paths.js')
+const proxyChain = require('proxy-chain');
 
-async function createAccountsWithSelenium(username, link, isWithCpf, changeVpn = false) {
+async function createAccountsWithSelenium(username, link, isWithCpf) {
     try {
-        if (changeVpn === true) {
-            disconnectVpn()
-            openVpn()
-        }
-        await pause()
-
         const options = new ChromeOptions();
         setOptions(options)
+        const oldProxyUrl = "http://user-lu6706062-region-br:vVBsTd@na.lunaproxy.com:12233"
+        const newProxyUrl = await proxyChain.anonymizeProxy(oldProxyUrl);
+        options.addArguments(`--proxy-server=${newProxyUrl}`)
 
         const driver = new Builder()
             .setChromeOptions(options)
@@ -97,12 +95,9 @@ async function createAccountsWithSelenium(username, link, isWithCpf, changeVpn =
         }
 
         // await closeBonusModal(driver)
-
-        if (changeVpn === true) {
-            disconnectVpn()
-        }
     } catch (e) {
-        await createAccountsWithSelenium(generateName(), link, isWithCpf, true);
+        console.log(e)
+        await createAccountsWithSelenium(generateName(), link, isWithCpf);
     }
 };
 
@@ -217,16 +212,6 @@ function setOptions(options) {
         height: 600
     })
 }
-
-const openVpn = (config) => exec(`python .\\src\\vpn.py${config ? ` ${config}` : ''}`);
-
-const disconnectVpn = () => exec('taskkill.exe /F /IM openvpn.exe');
-
-const pause = async () => await new Promise((resolve) => {
-    setTimeout(() => {
-        resolve()
-    }, 8000)
-});
 
 const generateName = () => `${faker
     .internet
