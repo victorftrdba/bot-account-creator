@@ -29,11 +29,11 @@ async function neverStop() {
     });
 }
 
-async function createAccountsWithSelenium(username, link, isWithCpf) {
+async function createAccountsWithSelenium(username, link, isWithCpf, proxy) {
     try {
         const options = new ChromeOptions();
         setOptions(options)
-        const oldProxyUrl = "http://user-lu6706062-region-br:vVBsTd@na.lunaproxy.com:12233"
+        const oldProxyUrl = `http://${proxy}`
         const newProxyUrl = await proxyChain.anonymizeProxy(oldProxyUrl);
         options.addArguments(`--proxy-server=${newProxyUrl}`)
 
@@ -105,7 +105,7 @@ async function createAccountsWithSelenium(username, link, isWithCpf) {
         await neverStop()
     } catch (e) {
         console.log(e)
-        await createAccountsWithSelenium(generateName(), link, isWithCpf);
+        await createAccountsWithSelenium(generateName(), link, isWithCpf, proxy);
     }
 };
 

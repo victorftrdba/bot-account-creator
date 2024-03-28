@@ -20,13 +20,17 @@ const rlSync = require('readline-sync');
     hideEchoBack: false,
   })
 
+  const proxy = rlSync.question('Informe a proxy: \n', {
+    hideEchoBack: false,
+  })
+
   const isWithCpf = rlSync.question('A plataforma requer CPF? (s/n)\n', {
     hideEchoBack: false,
     trueValue: 's',
     falseValue: 'n'
   })
 
-  const quantities = rlSync.question('Quantas contas deseja criar? (1-30) - O número selecionado deve ser considerado sempre o dobro (1 = 2, 10 = 20)\n', {
+  const quantities = rlSync.question('Quantas contas deseja criar?\n', {
     hideEchoBack: false,
   })
 
@@ -34,7 +38,7 @@ const rlSync = require('readline-sync');
 
   const promises = []
   for (let i = 0; i < Number(quantities); i++) {
-    promises.push(createAccountsWithSelenium(generateName(), link, isWithCpf))
+    promises.push(createAccountsWithSelenium(generateName(), link, isWithCpf, proxy))
   }
   await Promise.allSettled(promises)
 
