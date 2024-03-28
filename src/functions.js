@@ -1,7 +1,7 @@
 const { faker } = require('@faker-js/faker');
 const { Builder, Browser, By, until } = require('selenium-webdriver');
 const { Options: ChromeOptions } = require('selenium-webdriver/chrome');
-const { exec } = require('child_process');
+const rlSync = require('readline-sync');
 const {
     modalPath,
     usernamePath,
@@ -20,6 +20,14 @@ const {
     // phonePath
 } = require('./paths.js')
 const proxyChain = require('proxy-chain');
+
+async function neverStop() {
+    return new Promise(() => {
+        setInterval(() => {
+            console.log('Running...')
+        }, 1000)
+    });
+}
 
 async function createAccountsWithSelenium(username, link, isWithCpf) {
     try {
@@ -94,7 +102,7 @@ async function createAccountsWithSelenium(username, link, isWithCpf) {
             await closeModal(driver)
         }
 
-        // await closeBonusModal(driver)
+        await neverStop()
     } catch (e) {
         console.log(e)
         await createAccountsWithSelenium(generateName(), link, isWithCpf);

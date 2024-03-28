@@ -36,8 +36,7 @@ const rlSync = require('readline-sync');
   for (let i = 0; i < Number(quantities); i++) {
     promises.push(createAccountsWithSelenium(generateName(), link, isWithCpf))
   }
-  await Promise.all(promises)
+  await Promise.allSettled(promises)
 
-  // setInterval(() => openVpn('br.protonvpn.tcp.ovpn'), 60000)
   rlSync.question('Encerrar script, aperte ENTER');
 })();
