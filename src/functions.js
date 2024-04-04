@@ -30,83 +30,78 @@ async function neverStop() {
 }
 
 async function createAccountsWithSelenium(username, link, isWithCpf, proxy) {
-    try {
-        const options = new ChromeOptions();
-        setOptions(options)
-        const oldProxyUrl = `http://${proxy}`
-        const newProxyUrl = await proxyChain.anonymizeProxy(oldProxyUrl);
-        options.addArguments(`--proxy-server=${newProxyUrl}`)
+    const options = new ChromeOptions();
+    setOptions(options)
+    const oldProxyUrl = `http://${proxy}`
+    const newProxyUrl = await proxyChain.anonymizeProxy(oldProxyUrl);
+    options.addArguments(`--proxy-server=${newProxyUrl}`)
 
-        const driver = new Builder()
-            .setChromeOptions(options)
-            .forBrowser(Browser.CHROME)
-            .build();
+    const driver = new Builder()
+        .setChromeOptions(options)
+        .forBrowser(Browser.CHROME)
+        .build();
 
-        await driver.manage().deleteAllCookies();
-        await driver.get(link);
-        await findModal(driver);
-        await driver.navigate().refresh();
+    await driver.manage().deleteAllCookies();
+    await driver.get(link);
+    await findModal(driver);
+    await driver.navigate().refresh();
 
-        let registerButton = null;
-        if (isWithCpf === true) {
-            const {
-                userNameEl,
-                passwordEl,
-                confirmPasswordEl,
-                completeNameEl,
-                registerButtonEl,
-                cpfEl,
-            } = await findFormFields(driver, true);
-            await Promise.all([
-                userNameEl.sendKeys(username),
-                passwordEl.sendKeys('Quiqui45$'),
-                confirmPasswordEl.sendKeys('Quiqui45$'),
-                completeNameEl.sendKeys(username),
-                cpfEl.sendKeys(faker.string.numeric(11)),
-            ])
-            registerButton = registerButtonEl
-        } else {
-            const {
-                userNameEl,
-                passwordEl,
-                confirmPasswordEl,
-                completeNameEl,
-                registerButtonEl,
-            } = await findFormFields(driver, false);
-            await Promise.all([
-                userNameEl.sendKeys(username),
-                passwordEl.sendKeys('Quiqui45$'),
-                confirmPasswordEl.sendKeys('Quiqui45$'),
-                completeNameEl.sendKeys(username),
-            ])
-            registerButton = registerButtonEl
-        }
-        await registerButton?.click?.();
-
-        await findConfirmModal(driver);
-        const confirmRegistrationButtonEl = await findConfirmRegistrationButton(driver)
-        await confirmRegistrationButtonEl.click();
-
-        await findModalInfo(driver)
-        await closeModal(driver)
-        const { deposit10ButtonEl, rechargeButtonEl } = await findDeposit10Button(driver);
-        [deposit10ButtonEl, rechargeButtonEl].forEach(async (el) => await driver.executeScript("arguments[0].click();", el));
-
-        await driver.sleep(5000)
-        await driver.get(link);
-
-        const tabs = await driver.getAllWindowHandles();
-        await driver.switchTo().window(tabs[0]);
-
-        for (let i = 0; i < 2; i++) {
-            await closeModal(driver)
-        }
-
-        await neverStop()
-    } catch (e) {
-        console.log(e)
-        await createAccountsWithSelenium(generateName(), link, isWithCpf, proxy);
+    let registerButton = null;
+    if (isWithCpf === true) {
+        const {
+            userNameEl,
+            passwordEl,
+            confirmPasswordEl,
+            completeNameEl,
+            registerButtonEl,
+            cpfEl,
+        } = await findFormFields(driver, true);
+        await Promise.all([
+            userNameEl.sendKeys(username),
+            passwordEl.sendKeys('Quiqui45$'),
+            confirmPasswordEl.sendKeys('Quiqui45$'),
+            completeNameEl.sendKeys(username),
+            cpfEl.sendKeys(faker.string.numeric(11)),
+        ])
+        registerButton = registerButtonEl
+    } else {
+        const {
+            userNameEl,
+            passwordEl,
+            confirmPasswordEl,
+            completeNameEl,
+            registerButtonEl,
+        } = await findFormFields(driver, false);
+        await Promise.all([
+            userNameEl.sendKeys(username),
+            passwordEl.sendKeys('Quiqui45$'),
+            confirmPasswordEl.sendKeys('Quiqui45$'),
+            completeNameEl.sendKeys(username),
+        ])
+        registerButton = registerButtonEl
     }
+    await registerButton?.click?.();
+
+    await findConfirmModal(driver);
+    const confirmRegistrationButtonEl = await findConfirmRegistrationButton(driver)
+    await confirmRegistrationButtonEl.click();
+
+    await findModalInfo(driver)
+    await closeModal(driver)
+    const { deposit10ButtonEl, rechargeButtonEl } = await findDeposit10Button(driver);
+    [deposit10ButtonEl, rechargeButtonEl].forEach(async (el) => await driver.executeScript("arguments[0].click();", el));
+
+    await driver.sleep(5000)
+    await driver.get(link);
+
+    const tabs = await driver.getAllWindowHandles();
+    await driver.switchTo().window(tabs[0]);
+
+    for (let i = 0; i < 2; i++) {
+        await closeModal(driver)
+    }
+
+    await neverStop()
 };
 
 async function findModal(driver) {
