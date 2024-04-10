@@ -30,16 +30,26 @@ const rlSync = require('readline-sync');
     falseValue: 'n'
   })
 
+  const isWithPhone = rlSync.question('A plataforma requer telefone? (s/n)\n', {
+    hideEchoBack: false,
+    trueValue: 's',
+    falseValue: 'n'
+  })
+
+  const accountsPassword = rlSync.question('Informe a senha para as contas: \n')
+
   const quantities = rlSync.question('Quantas contas deseja criar?\n', {
     hideEchoBack: false,
   })
 
-  console.log(`Iniciando criação de contas para ${link} ${isWithCpf ? 'com CPF' : 'sem CPF'}`)
+  console.log(`Iniciando criação de contas para ${link} ${isWithCpf ? 'com CPF' : 'sem CPF'} ${isWithPhone ? 'com telefone' : 'sem telefone'}`)
 
   const promises = []
+
   for (let i = 0; i < Number(quantities); i++) {
-    promises.push(createAccountsWithSelenium(generateName(), link, isWithCpf, proxy))
+    promises.push(createAccountsWithSelenium(generateName(), link, isWithCpf, proxy, isWithPhone, accountsPassword))
   }
+
   await Promise.allSettled(promises)
 
   rlSync.question('Encerrar script, aperte ENTER');

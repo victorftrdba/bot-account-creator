@@ -1,7 +1,6 @@
 const { faker } = require('@faker-js/faker');
 const { Builder, Browser, By, until } = require('selenium-webdriver');
 const { Options: ChromeOptions } = require('selenium-webdriver/chrome');
-const rlSync = require('readline-sync');
 const {
     modalPath,
     usernamePath,
@@ -16,38 +15,37 @@ const {
     confirmModalPath,
     modalInfoPath,
     closeModalInfoPath,
-    confirmRegistrationButtonPath
-    // phonePath
+    confirmRegistrationButtonPath,
+    phonePath
 } = require('./paths.js')
 const proxyChain = require('proxy-chain');
 
 async function neverStop() {
     return new Promise(() => {
         setInterval(() => {
-            console.log('Running...')
+            console.log()
         }, 1000)
     });
 }
 
-async function createAccountsWithSelenium(username, link, isWithCpf, proxy) {
-    const options = new ChromeOptions();
-    setOptions(options)
-    const oldProxyUrl = `http://${proxy}`
-    const newProxyUrl = await proxyChain.anonymizeProxy(oldProxyUrl);
-    options.addArguments(`--proxy-server=${newProxyUrl}`)
+async function createAccountsWithSelenium(username, link, isWithCpf, proxy, isWithPhone, accountsPassword) {
+    try {
+        const options = new ChromeOptions();
+        setOptions(options)
+        const oldProxyUrl = `http://${proxy}`
+        const newProxyUrl = await proxyChain.anonymizeProxy(oldProxyUrl);
+        options.addArguments(`--proxy-server=${newProxyUrl}`)
 
-    const driver = new Builder()
-        .setChromeOptions(options)
-        .forBrowser(Browser.CHROME)
-        .build();
+        const driver = new Builder()
+            .setChromeOptions(options)
+            .forBrowser(Browser.CHROME)
+            .build();
 
-    await driver.manage().deleteAllCookies();
-    await driver.get(link);
-    await findModal(driver);
-    await driver.navigate().refresh();
+        await driver.manage().deleteAllCookies();
+        await driver.get(link);
+        await findModal(driver);
+        await driver.navigate().refresh();
 
-    let registerButton = null;
-    if (isWithCpf === true) {
         const {
             userNameEl,
             passwordEl,
@@ -55,53 +53,68 @@ async function createAccountsWithSelenium(username, link, isWithCpf, proxy) {
             completeNameEl,
             registerButtonEl,
             cpfEl,
-        } = await findFormFields(driver, true);
-        await Promise.all([
-            userNameEl.sendKeys(username),
-            passwordEl.sendKeys('Quiqui45$'),
-            confirmPasswordEl.sendKeys('Quiqui45$'),
-            completeNameEl.sendKeys(username),
-            cpfEl.sendKeys(faker.string.numeric(11)),
-        ])
-        registerButton = registerButtonEl
-    } else {
-        const {
-            userNameEl,
-            passwordEl,
-            confirmPasswordEl,
-            completeNameEl,
-            registerButtonEl,
-        } = await findFormFields(driver, false);
-        await Promise.all([
-            userNameEl.sendKeys(username),
-            passwordEl.sendKeys('Quiqui45$'),
-            confirmPasswordEl.sendKeys('Quiqui45$'),
-            completeNameEl.sendKeys(username),
-        ])
-        registerButton = registerButtonEl
-    }
-    await registerButton?.click?.();
+            phoneEl,
+        } = await findFormFields(driver, isWithCpf, isWithPhone);
 
-    await findConfirmModal(driver);
-    const confirmRegistrationButtonEl = await findConfirmRegistrationButton(driver)
-    await confirmRegistrationButtonEl.click();
+        if (isWithCpf === true) {
+            await Promise.all([
+                userNameEl.sendKeys(username),
+                passwordEl.sendKeys(accountsPassword),
+                confirmPasswordEl.sendKeys(accountsPassword),
+                completeNameEl.sendKeys(username),
+                cpfEl.sendKeys(faker.string.numeric(11)),
+            ])
+        } else if (isWithPhone === true && isWithCpf === true) {
+            await Promise.all([
+                userNameEl.sendKeys(username),
+                passwordEl.sendKeys(accountsPassword),
+                confirmPasswordEl.sendKeys(accountsPassword),
+                completeNameEl.sendKeys(username),
+                cpfEl.sendKeys(faker.string.numeric(11)),
+                phoneEl.sendKeys(faker.string.numeric(11)),
+            ])
+        } else if (isWithPhone === true && isWithCpf === false) {
+            await Promise.all([
+                userNameEl.sendKeys(username),
+                passwordEl.sendKeys(accountsPassword),
+                confirmPasswordEl.sendKeys(accountsPassword),
+                completeNameEl.sendKeys(username),
+                phoneEl.sendKeys(faker.string.numeric(11)),
+            ])
+        } else {
+            await Promise.all([
+                userNameEl.sendKeys(username),
+                passwordEl.sendKeys(accountsPassword),
+                confirmPasswordEl.sendKeys(accountsPassword),
+                completeNameEl.sendKeys(username),
+            ])
+        }
 
-    await findModalInfo(driver)
-    await closeModal(driver)
-    const { deposit10ButtonEl, rechargeButtonEl } = await findDeposit10Button(driver);
-    [deposit10ButtonEl, rechargeButtonEl].forEach(async (el) => await driver.executeScript("arguments[0].click();", el));
+        await registerButtonEl.click();
 
-    await driver.sleep(5000)
-    await driver.get(link);
+        await findConfirmModal(driver);
+        const confirmRegistrationButtonEl = await findConfirmRegistrationButton(driver)
+        await confirmRegistrationButtonEl.click();
 
-    const tabs = await driver.getAllWindowHandles();
-    await driver.switchTo().window(tabs[0]);
-
-    for (let i = 0; i < 2; i++) {
+        await findModalInfo(driver)
         await closeModal(driver)
-    }
+        const { deposit10ButtonEl, rechargeButtonEl } = await findDeposit10Button(driver);
+        [deposit10ButtonEl, rechargeButtonEl].forEach(async (el) => await driver.executeScript("arguments[0].click();", el));
 
-    await neverStop()
+        await driver.sleep(5000)
+        await driver.get(link);
+
+        const tabs = await driver.getAllWindowHandles();
+        await driver.switchTo().window(tabs[0]);
+
+        for (let i = 0; i < 2; i++) {
+            await closeModal(driver)
+        }
+
+        await neverStop()
+    } catch (e) {
+        console.log(e)
+    }
 };
 
 async function findModal(driver) {
@@ -110,8 +123,9 @@ async function findModal(driver) {
     return modal;
 }
 
-async function findFormFields(driver, isWithCpf) {
+async function findFormFields(driver, isWithCpf, isWithPhone) {
     let cpfEl = null;
+    let phoneEl = null;
     await driver.wait(until.elementLocated(By.css(usernamePath)));
     await driver.wait(until.elementLocated(By.css(passwordPath)));
     await driver.wait(until.elementLocated(By.css(confirmPasswordPath)));
@@ -126,6 +140,9 @@ async function findFormFields(driver, isWithCpf) {
     if (isWithCpf) {
         cpfEl = await driver.findElement(By.css(cpfPath));
     }
+    if (isWithPhone) {
+        phoneEl = await driver.findElement(By.css(phonePath));
+    }
     return {
         userNameEl,
         passwordEl,
@@ -133,6 +150,7 @@ async function findFormFields(driver, isWithCpf) {
         completeNameEl,
         registerButtonEl,
         cpfEl,
+        phoneEl
     }
 }
 
