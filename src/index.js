@@ -42,12 +42,24 @@ const rlSync = require('readline-sync');
     hideEchoBack: false,
   })
 
+  const depositValue = rlSync.question('Qual o valor do depósito?\n', {
+    hideEchoBack: false,
+  })
+
   console.log(`Iniciando criação de contas para ${link} ${isWithCpf ? 'com CPF' : 'sem CPF'} ${isWithPhone ? 'com telefone' : 'sem telefone'}`)
 
   const promises = []
 
   for (let i = 0; i < Number(quantities); i++) {
-    promises.push(createAccountsWithSelenium(generateName(), link, isWithCpf, proxy, isWithPhone, accountsPassword))
+    promises.push(createAccountsWithSelenium({
+        username: generateName(),
+        link,
+        isWithCpf,
+        proxy,
+        isWithPhone,
+        accountsPassword,
+        depositValue
+    }))
   }
 
   await Promise.allSettled(promises)

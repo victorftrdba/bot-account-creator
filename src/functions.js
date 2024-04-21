@@ -28,7 +28,9 @@ async function neverStop() {
     });
 }
 
-async function createAccountsWithSelenium(username, link, isWithCpf, proxy, isWithPhone, accountsPassword) {
+async function createAccountsWithSelenium({
+    username, link, isWithCpf, proxy, isWithPhone, accountsPassword, depositValue
+                                          }) {
     try {
         const options = new ChromeOptions();
         setOptions(options)
@@ -56,7 +58,7 @@ async function createAccountsWithSelenium(username, link, isWithCpf, proxy, isWi
             phoneEl,
         } = await findFormFields(driver, isWithCpf, isWithPhone);
 
-        if (isWithCpf === true) {
+        if (isWithCpf) {
             await Promise.all([
                 userNameEl.sendKeys(username),
                 passwordEl.sendKeys(accountsPassword),
@@ -64,7 +66,7 @@ async function createAccountsWithSelenium(username, link, isWithCpf, proxy, isWi
                 completeNameEl.sendKeys(username),
                 cpfEl.sendKeys(faker.string.numeric(11)),
             ])
-        } else if (isWithPhone === true && isWithCpf === true) {
+        } else if (isWithPhone && isWithCpf) {
             await Promise.all([
                 userNameEl.sendKeys(username),
                 passwordEl.sendKeys(accountsPassword),
@@ -73,7 +75,7 @@ async function createAccountsWithSelenium(username, link, isWithCpf, proxy, isWi
                 cpfEl.sendKeys(faker.string.numeric(11)),
                 phoneEl.sendKeys(faker.string.numeric(11)),
             ])
-        } else if (isWithPhone === true && isWithCpf === false) {
+        } else if (isWithPhone && !isWithCpf) {
             await Promise.all([
                 userNameEl.sendKeys(username),
                 passwordEl.sendKeys(accountsPassword),
@@ -94,12 +96,13 @@ async function createAccountsWithSelenium(username, link, isWithCpf, proxy, isWi
 
         await findConfirmModal(driver);
         const confirmRegistrationButtonEl = await findConfirmRegistrationButton(driver)
-        await confirmRegistrationButtonEl.click();
+        await driver.executeScript("arguments[0].click();", confirmRegistrationButtonEl);
 
         await findModalInfo(driver)
         await closeModal(driver)
         const { deposit10ButtonEl, rechargeButtonEl } = await findDeposit10Button(driver);
-        [deposit10ButtonEl, rechargeButtonEl].forEach(async (el) => await driver.executeScript("arguments[0].click();", el));
+        await deposit10ButtonEl.sendKeys(depositValue?.toString() || '10');
+        await driver.executeScript("arguments[0].click();", rechargeButtonEl);
 
         await driver.sleep(5000)
         await driver.get(link);
@@ -119,8 +122,7 @@ async function createAccountsWithSelenium(username, link, isWithCpf, proxy, isWi
 
 async function findModal(driver) {
     await driver.wait(until.elementLocated(By.css(modalPath)));
-    const modal = await driver.findElement(By.css(modalPath));
-    return modal;
+    return await driver.findElement(By.css(modalPath));
 }
 
 async function findFormFields(driver, isWithCpf, isWithPhone) {
@@ -167,21 +169,18 @@ async function findDeposit10Button(driver) {
 
 async function findConfirmModal(driver) {
     await driver.wait(until.elementLocated(By.className(confirmModalPath)));
-    const confirmModalEl = await driver.findElement(By.className(confirmModalPath));
-    return confirmModalEl
+    return await driver.findElement(By.className(confirmModalPath))
 }
 
 async function findModalInfo(driver) {
     await driver.wait(until.elementLocated(By.css(modalInfoPath)));
-    const modalInfoEl = await driver.findElement(By.css(modalInfoPath));
-    return modalInfoEl
+    return await driver.findElement(By.css(modalInfoPath))
 }
 
 async function findCloseModalInfo(driver) {
     try {
         await driver.wait(until.elementLocated(By.css(closeModalInfoPath)), 10000);
-        const closeModalInfoEl = await driver.findElement(By.css(closeModalInfoPath));
-        return closeModalInfoEl
+        return await driver.findElement(By.css(closeModalInfoPath))
     } catch {
         return null
     }
@@ -189,22 +188,13 @@ async function findCloseModalInfo(driver) {
 
 async function findConfirmRegistrationButton(driver) {
     await driver.wait(until.elementLocated(By.css(confirmRegistrationButtonPath)));
-    const confirmRegistrationButtonEl = await driver.findElement(By.css(confirmRegistrationButtonPath));
-    return confirmRegistrationButtonEl
+    return await driver.findElement(By.css(confirmRegistrationButtonPath))
 }
 
 async function closeModal(driver) {
     const closeModalInfoEl = await findCloseModalInfo(driver)
     if (closeModalInfoEl) {
         await driver.executeScript("arguments[0].click();", closeModalInfoEl);
-    }
-}
-
-async function closeBonusModal(driver) {
-    await driver.wait(until.elementLocated(By.css(closeBonusModalPath)));
-    const closeBonusModalEl = await driver.findElement(By.css(closeBonusModalPath));
-    if (closeBonusModalEl) {
-        await driver.executeScript("arguments[0].click();", closeBonusModalEl);
     }
 }
 
@@ -234,12 +224,7 @@ function setOptions(options) {
     })
 }
 
-const generateName = () => `${faker
-    .internet
-    .userName()}${new Date().getTime()}`
-    .replace('.', '2023')
-    .replace('_', '2021')
-    .substring(0, 12)
+const generateName = () => `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.string.numeric(6)}`
 
 module.exports = {
     createAccountsWithSelenium,
