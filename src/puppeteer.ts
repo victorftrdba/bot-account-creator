@@ -18,7 +18,7 @@ process.on('uncaughtException', () => {
         hideEchoBack: false,
     })
     const accountsPassword = rlSync.question('Informe a senha para as contas: \n', {
-        hideEchoBack: true,
+        hideEchoBack: false,
     })
     const platformModel = rlSync.question('O modelo da plataforma é o 1 ou 2? \n', {
         hideEchoBack: false,
@@ -52,18 +52,18 @@ async function createAccount({
     await page.setViewport({width: 1080, height: 1024});
     await page.goto(link)
 
+    await page.reload()
+
     if (platformModel === '1') {
         const usernameInput = "form > div:nth-child(1) > div > div > div > input"
         const passwordInput = "form > div:nth-child(2) > div > div > div > input"
         const confirmPasswordInput = "form > div:nth-child(4) > div > div > div > input"
         const completeNameInput = "form > div:nth-child(5) > div > div > div > input"
 
-        await Promise.all([
-            page.waitForSelector(usernameInput),
-            page.waitForSelector(passwordInput),
-            page.waitForSelector(confirmPasswordInput),
-            page.waitForSelector(completeNameInput),
-        ])
+        await  page.waitForSelector(usernameInput)
+            await page.waitForSelector(passwordInput)
+            await page.waitForSelector(confirmPasswordInput)
+            await page.waitForSelector(completeNameInput)
 
         await page.type(usernameInput, `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.string.numeric(6)}`)
         await page.type(passwordInput, accountsPassword)
@@ -86,17 +86,13 @@ async function createAccount({
         await page.waitForSelector(depositButton)
         await page.click(depositButton)
     } else if (platformModel === '2') {
-        await page.reload()
-
         const usernameInput = "form > div > div > div > div > div:nth-child(1) > div > div > div > span > span > input"
         const passwordInput = "form > div > div > div > div > div:nth-child(2) > div > div > div > span > span > input"
         const confirmPasswordInput = "form > div > div > div > div > div:nth-child(4) > div > div > div > span > span > input"
 
-        await Promise.all([
-            page.waitForSelector(usernameInput),
-            page.waitForSelector(passwordInput),
-            page.waitForSelector(confirmPasswordInput),
-        ])
+        await page.waitForSelector(usernameInput)
+        await page.waitForSelector(passwordInput)
+        await page.waitForSelector(confirmPasswordInput)
 
         await page.type(usernameInput, `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.string.numeric(6)}`)
         await page.type(passwordInput, accountsPassword)
