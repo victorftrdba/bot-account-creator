@@ -42,7 +42,7 @@ async function createAccount({
     accountsPassword: string,
     platformModel: string
 }) {
-    const depositLink = `${link.split('?')?.[0]}/deposit`
+    const depositLink = `${link.split('?')?.[0]}deposit`
 
     const browser = await puppeteer.launch({
         headless: false,
