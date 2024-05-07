@@ -2,7 +2,7 @@
 
 if command -v node &> /dev/null
 then
-    node ./src/index.js
+    ts-node ./src/puppeteer.ts
 else
     echo "Node.js não está instalado. Por favor, instale o Node.js para continuar."
 fi
