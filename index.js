@@ -1,5 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", {value: true});
 const puppeteer_1 = require("puppeteer");
 const faker_1 = require("@faker-js/faker");
 const proxyChain = require('proxy-chain');
@@ -24,11 +24,12 @@ process.on('uncaughtException', () => {
     });
     const promises = [];
     for (let i = 0; i < parseInt(quantities); i++) {
-        promises.push(createAccount({ link, proxy, accountsPassword, platformModel }));
+        promises.push(createAccount({link, proxy, accountsPassword, platformModel}));
     }
     await Promise.all(promises);
 })();
-async function createAccount({ link, proxy, accountsPassword, platformModel }) {
+
+async function createAccount({link, proxy, accountsPassword, platformModel}) {
     var _a;
     const depositLink = `${(_a = link.split('?')) === null || _a === void 0 ? void 0 : _a[0]}deposit`;
     const browser = await puppeteer_1.default.launch({
@@ -45,11 +46,11 @@ async function createAccount({ link, proxy, accountsPassword, platformModel }) {
             '--no-zygote',
             '--disable-breakpad',
             '--disable-hang-monitor',
-            '--disable-dev-profile'
+            '--disable-dev-profile',
         ],
     });
     const [page] = await browser.pages();
-    await page.setViewport({ width: 800, height: 600 });
+    await page.setViewport({width: 1280, height: 600});
     await page.goto(link);
     if (platformModel === '1') {
         const usernameInput = "form > div:nth-child(1) > div > div > div > input";
@@ -75,8 +76,7 @@ async function createAccount({ link, proxy, accountsPassword, platformModel }) {
         const depositButton = "#homeBoxScroll > div > div > div > div > div > button";
         await page.waitForSelector(depositButton);
         await page.click(depositButton);
-    }
-    else if (platformModel === '2') {
+    } else if (platformModel === '2') {
         const usernameInput = "form > div > div > div > div > div:nth-child(1) > div > div > div > span > span > input";
         const passwordInput = "form > div > div > div > div > div:nth-child(2) > div > div > div > span > span > input";
         const confirmPasswordInput = "form > div > div > div > div > div:nth-child(4) > div > div > div > span > span > input";
@@ -93,14 +93,16 @@ async function createAccount({ link, proxy, accountsPassword, platformModel }) {
     }
     await neverStop();
 }
+
 async function clickWithMouseOnElement(page, path) {
     const element = await page.waitForSelector(path);
     const rect = await page.evaluate(el => {
-        const { top, left, width, height } = el === null || el === void 0 ? void 0 : el.getBoundingClientRect();
-        return { top, left, width, height };
+        const {top, left, width, height} = el === null || el === void 0 ? void 0 : el.getBoundingClientRect();
+        return {top, left, width, height};
     }, element);
     await page.mouse.click((rect === null || rect === void 0 ? void 0 : rect.left) + (rect === null || rect === void 0 ? void 0 : rect.width) / 2, (rect === null || rect === void 0 ? void 0 : rect.top) + (rect === null || rect === void 0 ? void 0 : rect.height) / 2);
 }
+
 async function neverStop() {
     return new Promise(() => {
         setInterval(() => {
@@ -108,4 +110,5 @@ async function neverStop() {
         }, 1000);
     });
 }
+
 //# sourceMappingURL=index.js.map

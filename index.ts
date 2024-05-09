@@ -58,11 +58,11 @@ async function createAccount({
             '--no-zygote',
             '--disable-breakpad',
             '--disable-hang-monitor',
-            '--disable-dev-profile'
+            '--disable-dev-profile',
         ],
     });
     const [page] = await browser.pages();
-    await page.setViewport({width: 800, height: 600});
+    await page.setViewport({width: 1280, height: 600});
     await page.goto(link)
 
     if (platformModel === '1') {
@@ -71,7 +71,7 @@ async function createAccount({
         const confirmPasswordInput = "form > div:nth-child(4) > div > div > div > input"
         const completeNameInput = "form > div:nth-child(5) > div > div > div > input"
 
-        await  page.waitForSelector(usernameInput)
+        await page.waitForSelector(usernameInput)
         await page.waitForSelector(passwordInput)
         await page.waitForSelector(confirmPasswordInput)
         await page.waitForSelector(completeNameInput)
