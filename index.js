@@ -7,7 +7,7 @@ const rlSync = require('readline-sync');
 process.on('uncaughtException', async () => {
     await Promise.all(browsers.map(async (b) => b === null || b === void 0 ? void 0 : b.close()));
 });
-process.on('exit', async () => {
+process.on('SIGINT', async () => {
     await Promise.all(browsers.map(async (b) => b === null || b === void 0 ? void 0 : b.close()));
 });
 const browsers = [];

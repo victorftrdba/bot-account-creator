@@ -10,7 +10,7 @@ process.on('uncaughtException', async () => {
     )
 });
 
-process.on('exit', async () => {
+process.on('SIGINT', async () => {
     await Promise.all(
         browsers.map(async (b) => b?.close())
     )
