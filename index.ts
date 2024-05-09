@@ -1,11 +1,22 @@
-import puppeteer, {Page} from 'puppeteer';
+import puppeteer, {Browser, Page} from 'puppeteer';
 import {faker} from "@faker-js/faker";
 
 const proxyChain = require('proxy-chain');
 const rlSync = require('readline-sync');
 
-process.on('uncaughtException', () => {
+process.on('uncaughtException', async () => {
+    await Promise.all(
+        browsers.map(async (b) => b?.close())
+    )
 });
+
+process.on('exit', async () => {
+    await Promise.all(
+        browsers.map(async (b) => b?.close())
+    )
+})
+
+const browsers: Browser[] = [];
 
 (async () => {
     const link = rlSync.question('Informe o link da plataforma: \n', {
@@ -114,6 +125,8 @@ async function createAccount({
         await clickWithMouseOnElement(page, "section > div > div > div > div > div > div:nth-child(3) > section > div > ul > li:nth-child(1)")
         await clickWithMouseOnElement(page, "section > div.common-tabs-content > section > div > div > div > div > div > button")
     }
+
+    browsers.push(browser)
 
     await neverStop()
 }

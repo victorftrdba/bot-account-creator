@@ -4,8 +4,13 @@ const puppeteer_1 = require("puppeteer");
 const faker_1 = require("@faker-js/faker");
 const proxyChain = require('proxy-chain');
 const rlSync = require('readline-sync');
-process.on('uncaughtException', () => {
+process.on('uncaughtException', async () => {
+    await Promise.all(browsers.map(async (b) => b === null || b === void 0 ? void 0 : b.close()));
 });
+process.on('exit', async () => {
+    await Promise.all(browsers.map(async (b) => b === null || b === void 0 ? void 0 : b.close()));
+});
+const browsers = [];
 (async () => {
     const link = rlSync.question('Informe o link da plataforma: \n', {
         hideEchoBack: false,
@@ -91,6 +96,7 @@ async function createAccount({link, proxy, accountsPassword, platformModel}) {
         await clickWithMouseOnElement(page, "section > div > div > div > div > div > div:nth-child(3) > section > div > ul > li:nth-child(1)");
         await clickWithMouseOnElement(page, "section > div.common-tabs-content > section > div > div > div > div > div > button");
     }
+    browsers.push(browser);
     await neverStop();
 }
 
