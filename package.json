@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Victor Nogueira",
   "license": "ISC",
   "dependencies": {
     "collect.js": "^4.36.1",

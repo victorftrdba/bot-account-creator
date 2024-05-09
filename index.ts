@@ -110,7 +110,7 @@ async function createAccount({
         await page.type(confirmPasswordInput, accountsPassword)
 
         await clickWithMouseOnElement(page, "div > div > div.ant-row-flex.ant-row-flex-center.ant-row-flex-middle > button")
-        await clickWithMouseOnElement(page, "body > div > div > div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary")
+        await clickWithMouseOnElement(page, "div > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary")
         await clickWithMouseOnElement(page, "section > div > div > div > div > div > div:nth-child(3) > section > div > ul > li:nth-child(1)")
         await clickWithMouseOnElement(page, "section > div.common-tabs-content > section > div > div > div > div > div > button")
     }
@@ -121,7 +121,7 @@ async function createAccount({
 async function clickWithMouseOnElement(page: Page, path: string) {
     const element = await page.waitForSelector(path)
     const rect = await page.evaluate(el => {
-        const {top, left, width, height} = el?.getBoundingClientRect();
+        const {top, left, width, height} = el?.getBoundingClientRect() as DOMRect;
         return {top, left, width, height};
     }, element);
     await page.mouse.click(rect?.left + rect?.width / 2, rect?.top + rect?.height / 2);
