@@ -46,13 +46,24 @@ async function createAccount({
 
     const browser = await puppeteer.launch({
         headless: false,
-        args: [`--proxy-server=${await proxyChain.anonymizeProxy(`http://${proxy}`)}`, '--incognito'],
+        args: [
+            `--proxy-server=${await proxyChain.anonymizeProxy(`http://${proxy}`)}`,
+            '--incognito',
+            '--ignore-certificate-errors',
+            '--no-sandbox',
+            '--verbose',
+            '--disable-dev-shm-usage',
+            '--disable-web-security',
+            '--disable-xss-auditor',
+            '--no-zygote',
+            '--disable-breakpad',
+            '--disable-hang-monitor',
+            '--disable-dev-profile'
+        ],
     });
     const [page] = await browser.pages();
-    await page.setViewport({width: 1080, height: 1024});
+    await page.setViewport({width: 800, height: 600});
     await page.goto(link)
-
-    await page.reload()
 
     if (platformModel === '1') {
         const usernameInput = "form > div:nth-child(1) > div > div > div > input"
@@ -61,9 +72,9 @@ async function createAccount({
         const completeNameInput = "form > div:nth-child(5) > div > div > div > input"
 
         await  page.waitForSelector(usernameInput)
-            await page.waitForSelector(passwordInput)
-            await page.waitForSelector(confirmPasswordInput)
-            await page.waitForSelector(completeNameInput)
+        await page.waitForSelector(passwordInput)
+        await page.waitForSelector(confirmPasswordInput)
+        await page.waitForSelector(completeNameInput)
 
         await page.type(usernameInput, `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.string.numeric(6)}`)
         await page.type(passwordInput, accountsPassword)
