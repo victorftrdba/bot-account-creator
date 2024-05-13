@@ -25,13 +25,13 @@ const browsers: Browser[] = [];
     const proxy = rlSync.question('Informe a proxy: \n', {
         hideEchoBack: false,
     })
-    const quantities = rlSync.question('Quantas contas deseja criar?\n', {
+    const quantities = rlSync.question('Quantidade de contas para criar: \n', {
         hideEchoBack: false,
     })
     const accountsPassword = rlSync.question('Informe a senha para as contas: \n', {
         hideEchoBack: false,
     })
-    const platformModel = rlSync.question('O modelo da plataforma é o 1 ou 2? \n', {
+    const platformModel = rlSync.question('Modelo da plataforma (1 ou 2): \n', {
         hideEchoBack: false,
     })
 
@@ -53,28 +53,31 @@ async function createAccount({
     accountsPassword: string,
     platformModel: string
 }) {
-    const depositLink = `${link.split('?')?.[0]}deposit`
+    const mainLink = link.replace?.("https://", "").split?.("/")?.[0]
+    const depositLink = `https://${mainLink}/deposit`
 
     const browser = await puppeteer.launch({
         headless: false,
+        defaultViewport: null,
+        ignoreDefaultArgs: true,
         args: [
             `--proxy-server=${await proxyChain.anonymizeProxy(`http://${proxy}`)}`,
             '--incognito',
-            '--ignore-certificate-errors',
-            '--no-sandbox',
             '--verbose',
             '--disable-dev-shm-usage',
-            '--disable-web-security',
             '--disable-xss-auditor',
             '--no-zygote',
             '--disable-breakpad',
             '--disable-hang-monitor',
             '--disable-dev-profile',
+            '--start-maximized',
+            '--disable-infobars'
         ],
     });
     const [page] = await browser.pages();
-    await page.setViewport({width: 1280, height: 600});
-    await page.goto(link)
+    await page.goto(link, {
+        waitUntil: "networkidle0"
+    })
 
     if (platformModel === '1') {
         const usernameInput = "form > div:nth-child(1) > div > div > div > input"
@@ -87,18 +90,27 @@ async function createAccount({
         await page.waitForSelector(confirmPasswordInput)
         await page.waitForSelector(completeNameInput)
 
-        await page.type(usernameInput, `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.string.numeric(6)}`)
-        await page.type(passwordInput, accountsPassword)
-        await page.type(confirmPasswordInput, accountsPassword)
-        await page.type(completeNameInput, `${faker.person.firstName()} ${faker.person.lastName()}`)
+        await page.type(usernameInput, `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.string.numeric(6)}`, {
+            delay: 100
+        })
+        await page.type(passwordInput, accountsPassword, {
+            delay: 100
+        })
+        await page.type(confirmPasswordInput, accountsPassword, {
+            delay: 100
+        })
+        await page.type(completeNameInput, `${faker.person.firstName()} ${faker.person.lastName()}`, {
+            delay: 100
+        })
 
         const registerButton = "form > div:nth-child(7) > button"
-
         await page.waitForSelector(registerButton)
         await page.click(registerButton)
 
         await page.evaluate(async () => await new Promise(resolve => setTimeout(resolve, 2000)))
-        await page.goto(depositLink)
+        await page.goto(depositLink, {
+            waitUntil: "networkidle0"
+        })
 
         const depositAmountElement = '#homeBoxScroll > div > div > div > div > section:nth-child(10) > div:nth-child(1)'
         await page.waitForSelector(depositAmountElement)
@@ -116,9 +128,15 @@ async function createAccount({
         await page.waitForSelector(passwordInput)
         await page.waitForSelector(confirmPasswordInput)
 
-        await page.type(usernameInput, `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.string.numeric(6)}`)
-        await page.type(passwordInput, accountsPassword)
-        await page.type(confirmPasswordInput, accountsPassword)
+        await page.type(usernameInput, `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.string.numeric(6)}`, {
+            delay: 100
+        })
+        await page.type(passwordInput, accountsPassword, {
+            delay: 100
+        })
+        await page.type(confirmPasswordInput, accountsPassword, {
+            delay: 100
+        })
 
         await clickWithMouseOnElement(page, "div > div > div.ant-row-flex.ant-row-flex-center.ant-row-flex-middle > button")
         await clickWithMouseOnElement(page, "div > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary")
