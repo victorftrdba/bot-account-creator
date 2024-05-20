@@ -15,9 +15,9 @@ const browsers = [];
     const link = rlSync.question('Informe o link da plataforma: \n', {
         hideEchoBack: false,
     });
-    const proxy = rlSync.question('Informe a proxy: \n', {
-        hideEchoBack: false,
-    });
+    // const proxy = rlSync.question('Informe a proxy: \n', {
+    //     hideEchoBack: false,
+    // })
     const quantities = rlSync.question('Quantidade de contas para criar: \n', {
         hideEchoBack: false,
     });
@@ -29,14 +29,29 @@ const browsers = [];
     });
     const promises = [];
     for (let i = 0; i < parseInt(quantities); i++) {
-        promises.push(createAccount({ link, proxy, accountsPassword, platformModel }));
+        promises.push(createAccount({
+            link,
+            proxy: "dzmmopgq-rotate:89o959rw0ydt@p.webshare.io:80",
+            accountsPassword,
+            platformModel,
+            index: i
+        }));
     }
-    await Promise.all(promises);
+    await Promise.allSettled(promises);
 })();
-async function createAccount({ link, proxy, accountsPassword, platformModel }) {
+function getWindowPosition(index, step, resetValue) {
+    return (index * step) % resetValue;
+}
+function getWindowPositionYByIndexMultiple(index) {
+    return index % 3 === 0 ? 0 : 500;
+}
+async function createAccount({ link, proxy, accountsPassword, platformModel, index }) {
     var _a, _b, _c, _d;
     const mainLink = (_d = (_c = (_a = link.replace) === null || _a === void 0 ? void 0 : (_b = _a.call(link, "https://", "")).split) === null || _c === void 0 ? void 0 : _c.call(_b, "/")) === null || _d === void 0 ? void 0 : _d[0];
     const depositLink = `https://${mainLink}/deposit`;
+    const step = 500;
+    const resetValue = 2000;
+    const show4WindowsSideBySide = `--window-position=${getWindowPosition(index, step, resetValue)},${getWindowPositionYByIndexMultiple(index)}`;
     const browser = await puppeteer_1.default.launch({
         headless: false,
         defaultViewport: null,
@@ -52,71 +67,106 @@ async function createAccount({ link, proxy, accountsPassword, platformModel }) {
             '--disable-hang-monitor',
             '--disable-dev-profile',
             '--start-maximized',
-            '--disable-infobars'
+            '--disable-infobars',
+            show4WindowsSideBySide,
+            '--window-size=500,500'
         ],
     });
-    const [page] = await browser.pages();
-    await page.goto(link, {
-        waitUntil: "networkidle0"
-    });
-    if (platformModel === '1') {
-        const usernameInput = "form > div:nth-child(1) > div > div > div > input";
-        const passwordInput = "form > div:nth-child(2) > div > div > div > input";
-        const confirmPasswordInput = "form > div:nth-child(4) > div > div > div > input";
-        const completeNameInput = "form > div:nth-child(5) > div > div > div > input";
-        await page.waitForSelector(usernameInput);
-        await page.waitForSelector(passwordInput);
-        await page.waitForSelector(confirmPasswordInput);
-        await page.waitForSelector(completeNameInput);
-        await page.type(usernameInput, `${faker_1.faker.person.firstName().toLowerCase().substring(0, 8)}${faker_1.faker.string.numeric(6)}`, {
-            delay: 100
-        });
-        await page.type(passwordInput, accountsPassword, {
-            delay: 100
-        });
-        await page.type(confirmPasswordInput, accountsPassword, {
-            delay: 100
-        });
-        await page.type(completeNameInput, `${faker_1.faker.person.firstName()} ${faker_1.faker.person.lastName()}`, {
-            delay: 100
-        });
-        const registerButton = "form > div:nth-child(7) > button";
-        await page.waitForSelector(registerButton);
-        await page.click(registerButton);
-        await page.evaluate(async () => await new Promise(resolve => setTimeout(resolve, 2000)));
-        await page.goto(depositLink, {
+    try {
+        const [page] = await browser.pages();
+        await page.goto(link, {
             waitUntil: "networkidle0"
         });
-        const depositAmountElement = '#homeBoxScroll > div > div > div > div > section:nth-child(10) > div:nth-child(1)';
-        await page.waitForSelector(depositAmountElement);
-        await page.click(depositAmountElement);
-        const depositButton = "#homeBoxScroll > div > div > div > div > div > button";
-        await page.waitForSelector(depositButton);
-        await page.click(depositButton);
+        if (platformModel === '1') {
+            try {
+                const confirmAfk = await page.waitForSelector("div:nth-child(8) > div > div > div > div", {
+                    timeout: 2000,
+                    signal: undefined
+                });
+                await (confirmAfk === null || confirmAfk === void 0 ? void 0 : confirmAfk.click());
+                await page.waitForNavigation();
+            }
+            catch (e) {
+                console.log(e);
+            }
+            const usernameInput = "form > div:nth-child(1) > div > div > div > input";
+            const passwordInput = "form > div:nth-child(2) > div > div > div > input";
+            const confirmPasswordInput = "form > div:nth-child(4) > div > div > div > input";
+            await page.waitForSelector(usernameInput, {
+                timeout: 2000,
+                signal: undefined
+            });
+            await page.waitForSelector(passwordInput, {
+                timeout: 2000,
+                signal: undefined
+            });
+            await page.waitForSelector(confirmPasswordInput, {
+                timeout: 2000,
+                signal: undefined
+            });
+            await page.type(usernameInput, `${faker_1.faker.person.firstName().toLowerCase().substring(0, 8)}${faker_1.faker.string.numeric(6)}`);
+            await page.type(passwordInput, accountsPassword);
+            await page.type(confirmPasswordInput, accountsPassword);
+            const registerButton = "form > div:nth-child(6) > button";
+            await page.waitForSelector(registerButton, {
+                timeout: 2000,
+                signal: undefined
+            });
+            await page.click(registerButton);
+            await page.evaluate(async () => await new Promise(resolve => setTimeout(resolve, 2000)));
+            await page.goto(depositLink, {
+                waitUntil: "networkidle0"
+            });
+            const depositAmountElement = 'div > div > div > div > div > div > div > input';
+            await page.waitForSelector(depositAmountElement, {
+                timeout: 2000,
+                signal: undefined
+            });
+            await page.type(depositAmountElement, '10');
+            const depositButton = "div > div > div > div > button";
+            await page.waitForSelector(depositButton, {
+                timeout: 2000,
+                signal: undefined
+            });
+            await page.click(depositButton);
+        }
+        else if (platformModel === '2') {
+            const usernameInput = "form > div > div > div > div > div:nth-child(1) > div > div > div > span > span > input";
+            const passwordInput = "form > div > div > div > div > div:nth-child(2) > div > div > div > span > span > input";
+            const confirmPasswordInput = "form > div > div > div > div > div:nth-child(4) > div > div > div > span > span > input";
+            await page.waitForSelector(usernameInput, {
+                timeout: 2000,
+                signal: undefined
+            });
+            await page.waitForSelector(passwordInput, {
+                timeout: 2000,
+                signal: undefined
+            });
+            await page.waitForSelector(confirmPasswordInput, {
+                timeout: 2000,
+                signal: undefined
+            });
+            await page.type(usernameInput, `${faker_1.faker.person.firstName().toLowerCase().substring(0, 8)}${faker_1.faker.string.numeric(6)}`);
+            await page.type(passwordInput, accountsPassword);
+            await page.type(confirmPasswordInput, accountsPassword);
+            await clickWithMouseOnElement(page, "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div > div > div.ant-row-flex.ant-row-flex-center.ant-row-flex-middle > button");
+            await clickWithMouseOnElement(page, "div > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary");
+            await clickWithMouseOnElement(page, "section > div > div > div > div > div > div:nth-child(3) > section > div > ul > li:nth-child(1)");
+            await clickWithMouseOnElement(page, "section > div.common-tabs-content > section > div > div > div > div > div > button");
+        }
+        browsers.push(browser);
+        await neverStop();
     }
-    else if (platformModel === '2') {
-        const usernameInput = "form > div > div > div > div > div:nth-child(1) > div > div > div > span > span > input";
-        const passwordInput = "form > div > div > div > div > div:nth-child(2) > div > div > div > span > span > input";
-        const confirmPasswordInput = "form > div > div > div > div > div:nth-child(4) > div > div > div > span > span > input";
-        await page.waitForSelector(usernameInput);
-        await page.waitForSelector(passwordInput);
-        await page.waitForSelector(confirmPasswordInput);
-        await page.type(usernameInput, `${faker_1.faker.person.firstName().toLowerCase().substring(0, 8)}${faker_1.faker.string.numeric(6)}`, {
-            delay: 100
+    catch (_e) {
+        await (browser === null || browser === void 0 ? void 0 : browser.close());
+        await createAccount({
+            link,
+            proxy,
+            accountsPassword,
+            platformModel,
+            index
         });
-        await page.type(passwordInput, accountsPassword, {
-            delay: 100
-        });
-        await page.type(confirmPasswordInput, accountsPassword, {
-            delay: 100
-        });
-        await clickWithMouseOnElement(page, "div > div > div.ant-row-flex.ant-row-flex-center.ant-row-flex-middle > button");
-        await clickWithMouseOnElement(page, "div > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary");
-        await clickWithMouseOnElement(page, "section > div > div > div > div > div > div:nth-child(3) > section > div > ul > li:nth-child(1)");
-        await clickWithMouseOnElement(page, "section > div.common-tabs-content > section > div > div > div > div > div > button");
     }
-    browsers.push(browser);
-    await neverStop();
 }
 async function clickWithMouseOnElement(page, path) {
     const element = await page.waitForSelector(path);
