@@ -22,9 +22,9 @@ const browsers: Browser[] = [];
     const link = rlSync.question('Informe o link da plataforma: \n', {
         hideEchoBack: false,
     })
-    // const proxy = rlSync.question('Informe a proxy: \n', {
-    //     hideEchoBack: false,
-    // })
+    const proxy = rlSync.question('Informe a proxy: \n', {
+        hideEchoBack: false,
+    })
     const quantities = rlSync.question('Quantidade de contas para criar: \n', {
         hideEchoBack: false,
     })
@@ -39,7 +39,7 @@ const browsers: Browser[] = [];
     for (let i = 0; i < parseInt(quantities); i++) {
         promises.push(createAccount({
             link,
-            proxy: "dzmmopgq-rotate:89o959rw0ydt@p.webshare.io:80",
+            proxy,
             accountsPassword,
             platformModel,
             index: i
@@ -72,8 +72,8 @@ async function createAccount({
     const mainLink = link.replace?.("https://", "").split?.("/")?.[0]
     const depositLink = `https://${mainLink}/deposit`
 
-    const step = 500;
-    const resetValue = 2000;
+    const step = 350;
+    const resetValue = 1750;
     const show4WindowsSideBySide = `--window-position=${getWindowPosition(index, step, resetValue)},${getWindowPositionYByIndexMultiple(index)}`
 
     const browser = await puppeteer.launch({
@@ -93,7 +93,7 @@ async function createAccount({
             '--start-maximized',
             '--disable-infobars',
             show4WindowsSideBySide,
-            '--window-size=500,500'
+            '--window-size=250,500'
         ],
     });
 
@@ -120,15 +120,15 @@ async function createAccount({
             const confirmPasswordInput = "form > div:nth-child(4) > div > div > div > input"
 
             await page.waitForSelector(usernameInput, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             })
             await page.waitForSelector(passwordInput, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             })
             await page.waitForSelector(confirmPasswordInput, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             })
 
@@ -138,7 +138,7 @@ async function createAccount({
 
             const registerButton = "form > div:nth-child(6) > button"
             await page.waitForSelector(registerButton, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             })
             await page.click(registerButton)
@@ -150,14 +150,14 @@ async function createAccount({
 
             const depositAmountElement = 'div > div > div > div > div > div > div > input'
             await page.waitForSelector(depositAmountElement, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             })
             await page.type(depositAmountElement, '10')
 
             const depositButton = "div > div > div > div > button"
             await page.waitForSelector(depositButton, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             })
             await page.click(depositButton)
@@ -167,15 +167,15 @@ async function createAccount({
             const confirmPasswordInput = "form > div > div > div > div > div:nth-child(4) > div > div > div > span > span > input"
 
             await page.waitForSelector(usernameInput, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             })
             await page.waitForSelector(passwordInput, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             })
             await page.waitForSelector(confirmPasswordInput, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             })
 
@@ -192,7 +192,8 @@ async function createAccount({
         browsers.push(browser)
 
         await neverStop()
-    } catch {
+    } catch (e) {
+        console.log(e)
         await browser?.close()
         await createAccount({
             link,

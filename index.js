@@ -15,9 +15,9 @@ const browsers = [];
     const link = rlSync.question('Informe o link da plataforma: \n', {
         hideEchoBack: false,
     });
-    // const proxy = rlSync.question('Informe a proxy: \n', {
-    //     hideEchoBack: false,
-    // })
+    const proxy = rlSync.question('Informe a proxy: \n', {
+        hideEchoBack: false,
+    });
     const quantities = rlSync.question('Quantidade de contas para criar: \n', {
         hideEchoBack: false,
     });
@@ -31,7 +31,7 @@ const browsers = [];
     for (let i = 0; i < parseInt(quantities); i++) {
         promises.push(createAccount({
             link,
-            proxy: "dzmmopgq-rotate:89o959rw0ydt@p.webshare.io:80",
+            proxy,
             accountsPassword,
             platformModel,
             index: i
@@ -49,8 +49,8 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, ind
     var _a, _b, _c, _d;
     const mainLink = (_d = (_c = (_a = link.replace) === null || _a === void 0 ? void 0 : (_b = _a.call(link, "https://", "")).split) === null || _c === void 0 ? void 0 : _c.call(_b, "/")) === null || _d === void 0 ? void 0 : _d[0];
     const depositLink = `https://${mainLink}/deposit`;
-    const step = 500;
-    const resetValue = 2000;
+    const step = 350;
+    const resetValue = 1750;
     const show4WindowsSideBySide = `--window-position=${getWindowPosition(index, step, resetValue)},${getWindowPositionYByIndexMultiple(index)}`;
     const browser = await puppeteer_1.default.launch({
         headless: false,
@@ -69,7 +69,7 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, ind
             '--start-maximized',
             '--disable-infobars',
             show4WindowsSideBySide,
-            '--window-size=500,500'
+            '--window-size=250,500'
         ],
     });
     try {
@@ -93,15 +93,15 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, ind
             const passwordInput = "form > div:nth-child(2) > div > div > div > input";
             const confirmPasswordInput = "form > div:nth-child(4) > div > div > div > input";
             await page.waitForSelector(usernameInput, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             });
             await page.waitForSelector(passwordInput, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             });
             await page.waitForSelector(confirmPasswordInput, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             });
             await page.type(usernameInput, `${faker_1.faker.person.firstName().toLowerCase().substring(0, 8)}${faker_1.faker.string.numeric(6)}`);
@@ -109,7 +109,7 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, ind
             await page.type(confirmPasswordInput, accountsPassword);
             const registerButton = "form > div:nth-child(6) > button";
             await page.waitForSelector(registerButton, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             });
             await page.click(registerButton);
@@ -119,13 +119,13 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, ind
             });
             const depositAmountElement = 'div > div > div > div > div > div > div > input';
             await page.waitForSelector(depositAmountElement, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             });
             await page.type(depositAmountElement, '10');
             const depositButton = "div > div > div > div > button";
             await page.waitForSelector(depositButton, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             });
             await page.click(depositButton);
@@ -135,15 +135,15 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, ind
             const passwordInput = "form > div > div > div > div > div:nth-child(2) > div > div > div > span > span > input";
             const confirmPasswordInput = "form > div > div > div > div > div:nth-child(4) > div > div > div > span > span > input";
             await page.waitForSelector(usernameInput, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             });
             await page.waitForSelector(passwordInput, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             });
             await page.waitForSelector(confirmPasswordInput, {
-                timeout: 2000,
+                timeout: 10000,
                 signal: undefined
             });
             await page.type(usernameInput, `${faker_1.faker.person.firstName().toLowerCase().substring(0, 8)}${faker_1.faker.string.numeric(6)}`);
@@ -157,7 +157,8 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, ind
         browsers.push(browser);
         await neverStop();
     }
-    catch (_e) {
+    catch (e) {
+        console.log(e);
         await (browser === null || browser === void 0 ? void 0 : browser.close());
         await createAccount({
             link,
