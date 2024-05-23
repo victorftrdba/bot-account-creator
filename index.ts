@@ -100,8 +100,10 @@ async function createAccount({
     try {
         const [page] = await browser.pages();
         await page.goto(link, {
-            waitUntil: "networkidle0"
+            waitUntil: "networkidle0",
+            timeout: 0
         })
+        const username = `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.string.numeric(3)}`
 
         if (platformModel === '1') {
             try {
@@ -132,7 +134,7 @@ async function createAccount({
                 signal: undefined
             })
 
-            await page.type(usernameInput, `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.string.numeric(6)}`)
+            await page.type(usernameInput, username)
             await page.type(passwordInput, accountsPassword)
             await page.type(confirmPasswordInput, accountsPassword)
 
@@ -166,20 +168,11 @@ async function createAccount({
             const passwordInput = "form > div > div > div > div > div:nth-child(2) > div > div > div > span > span > input"
             const confirmPasswordInput = "form > div > div > div > div > div:nth-child(4) > div > div > div > span > span > input"
 
-            await page.waitForSelector(usernameInput, {
-                timeout: 10000,
-                signal: undefined
-            })
-            await page.waitForSelector(passwordInput, {
-                timeout: 10000,
-                signal: undefined
-            })
-            await page.waitForSelector(confirmPasswordInput, {
-                timeout: 10000,
-                signal: undefined
-            })
+            await page.waitForSelector(usernameInput)
+            await page.waitForSelector(passwordInput)
+            await page.waitForSelector(confirmPasswordInput)
 
-            await page.type(usernameInput, `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.string.numeric(6)}`)
+            await page.type(usernameInput, username)
             await page.type(passwordInput, accountsPassword)
             await page.type(confirmPasswordInput, accountsPassword)
 
@@ -206,7 +199,9 @@ async function createAccount({
 }
 
 async function clickWithMouseOnElement(page: Page, path: string) {
-    const element = await page.waitForSelector(path)
+    const element = await page.waitForSelector(path, {
+        timeout: 0
+    })
     const rect = await page.evaluate(el => {
         const {top, left, width, height} = el?.getBoundingClientRect() as DOMRect;
         return {top, left, width, height};
