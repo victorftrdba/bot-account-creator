@@ -69,12 +69,15 @@ async function createAccount({
     platformModel: string
     index: number
 }) {
+    link = "https://amei777.win/?id=599473923&currency=BRL&type=2"
     const mainLink = link.replace?.("https://", "").split?.("/")?.[0]
     const depositLink = `https://${mainLink}/deposit`
 
     const step = 350;
     const resetValue = 1750;
     const show4WindowsSideBySide = `--window-position=${getWindowPosition(index, step, resetValue)},${getWindowPositionYByIndexMultiple(index)}`
+
+    proxy = "dzmmopgq-rotate:89o959rw0ydt@p.webshare.io:80"
 
     const browser = await puppeteer.launch({
         headless: false,
@@ -177,7 +180,8 @@ async function createAccount({
             await page.type(confirmPasswordInput, accountsPassword)
 
             await clickWithMouseOnElement(page, "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div > div > div.ant-row-flex.ant-row-flex-center.ant-row-flex-middle > button")
-            await clickWithMouseOnElement(page, "div > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary")
+            await clickOnElement(page, "div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-body > div > div > div.closeIcon > img")
+            await clickOnElement(page, "div > div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary")
             await clickWithMouseOnElement(page, "section > div > div > div > div > div > div:nth-child(3) > section > div > ul > li:nth-child(1)")
             await clickWithMouseOnElement(page, "section > div.common-tabs-content > section > div > div > div > div > div > button")
         }
@@ -215,4 +219,14 @@ async function neverStop() {
             console.log()
         }, 1000)
     });
+}
+
+async function clickOnElement(page: Page, path: string) {
+    await page.evaluate(async (path) => await new Promise(resolve => {
+        const element = document.querySelector(path) as any
+
+        setInterval(() => {
+            resolve(element?.click())
+        }, 1000)
+    }), path)
 }
