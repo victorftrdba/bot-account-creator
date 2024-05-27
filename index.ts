@@ -70,6 +70,7 @@ async function createAccount({
     index: number
 }) {
     link = "https://amei777.win/?id=599473923&currency=BRL&type=2"
+
     const mainLink = link.replace?.("https://", "").split?.("/")?.[0]
     const depositLink = `https://${mainLink}/deposit`
 
@@ -181,7 +182,7 @@ async function createAccount({
 
             await clickWithMouseOnElement(page, "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div > div > div.ant-row-flex.ant-row-flex-center.ant-row-flex-middle > button")
             await clickOnElement(page, "div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-body > div > div > div.closeIcon > img")
-            await clickOnElement(page, "div > div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary")
+            await clickOnElement(page, ".ant-btn-primary")
             await clickWithMouseOnElement(page, "section > div > div > div > div > div > div:nth-child(3) > section > div > ul > li:nth-child(1)")
             await clickWithMouseOnElement(page, "section > div.common-tabs-content > section > div > div > div > div > div > button")
         }
