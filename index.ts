@@ -69,7 +69,7 @@ async function createAccount({
     platformModel: string
     index: number
 }) {
-    link = "https://amei777.win/?id=599473923&currency=BRL&type=2"
+    link = "https://www.presidentepg.love/?id=471757213&currency=BRL&type=2"
 
     const mainLink = link.replace?.("https://", "").split?.("/")?.[0]
     const depositLink = `https://${mainLink}/deposit`
@@ -104,23 +104,12 @@ async function createAccount({
     try {
         const [page] = await browser.pages();
         await page.goto(link, {
-            waitUntil: "networkidle0",
+            waitUntil: "domcontentloaded",
             timeout: 0
         })
         const username = `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.string.numeric(3)}`
 
         if (platformModel === '1') {
-            try {
-                const confirmAfk = await page.waitForSelector("div:nth-child(8) > div > div > div > div", {
-                    timeout: 2000,
-                    signal: undefined
-                })
-                await confirmAfk?.click()
-                await page.waitForNavigation()
-            } catch (e) {
-                console.log(e)
-            }
-
             const usernameInput = "form > div:nth-child(1) > div > div > div > input"
             const passwordInput = "form > div:nth-child(2) > div > div > div > input"
             const confirmPasswordInput = "form > div:nth-child(4) > div > div > div > input"
@@ -151,7 +140,7 @@ async function createAccount({
 
             await page.evaluate(async () => await new Promise(resolve => setTimeout(resolve, 2000)))
             await page.goto(depositLink, {
-                waitUntil: "networkidle0"
+                waitUntil: "domcontentloaded"
             })
 
             const depositAmountElement = 'div > div > div > div > div > div > div > input'
@@ -168,6 +157,8 @@ async function createAccount({
             })
             await page.click(depositButton)
         } else if (platformModel === '2') {
+            await page.reload()
+
             const usernameInput = "form > div > div > div > div > div:nth-child(1) > div > div > div > span > span > input"
             const passwordInput = "form > div > div > div > div > div:nth-child(2) > div > div > div > span > span > input"
             const confirmPasswordInput = "form > div > div > div > div > div:nth-child(4) > div > div > div > span > span > input"
