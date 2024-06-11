@@ -48,13 +48,13 @@ const browsers: Browser[] = [];
     await Promise.allSettled(promises)
 })()
 
-function getWindowPosition(index: number, step: number, resetValue: number): number {
-    return (index * step) % resetValue;
-}
+// function getWindowPosition(index: number, step: number, resetValue: number): number {
+//     return (index * step) % resetValue;
+// }
 
-function getWindowPositionYByIndexMultiple(index: number) {
-    return index % 3 === 0 ? 0 : 500
-}
+// function getWindowPositionYByIndexMultiple(index: number) {
+//     return index % 3 === 0 ? 0 : 500
+// }
 
 async function createAccount({
                                  link,
@@ -69,16 +69,12 @@ async function createAccount({
     platformModel: string
     index: number
 }) {
-    link = "https://www.presidentepg.love/?id=471757213&currency=BRL&type=2"
-
     const mainLink = link.replace?.("https://", "").split?.("/")?.[0]
     const depositLink = `https://${mainLink}/deposit`
 
-    const step = 350;
-    const resetValue = 1750;
-    const show4WindowsSideBySide = `--window-position=${getWindowPosition(index, step, resetValue)},${getWindowPositionYByIndexMultiple(index)}`
-
-    proxy = "dzmmopgq-rotate:89o959rw0ydt@p.webshare.io:80"
+    // const step = 350;
+    //const resetValue = 1750;
+    // const show4WindowsSideBySide = `--window-position=${getWindowPosition(index, step, resetValue)},${getWindowPositionYByIndexMultiple(index)}`
 
     const browser = await puppeteer.launch({
         headless: false,
@@ -96,17 +92,17 @@ async function createAccount({
             '--disable-dev-profile',
             '--start-maximized',
             '--disable-infobars',
-            show4WindowsSideBySide,
+            // show4WindowsSideBySide,
             '--window-size=250,500'
         ],
     });
 
     try {
         const [page] = await browser.pages();
-        await page.goto(link, {
-            waitUntil: "domcontentloaded",
-            timeout: 0
-        })
+        page.setDefaultNavigationTimeout(0);
+        page.setDefaultTimeout(0)
+        await page.goto(link)
+        await page.reload()
         const username = `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.string.numeric(3)}`
 
         if (platformModel === '1') {
@@ -114,47 +110,27 @@ async function createAccount({
             const passwordInput = "form > div:nth-child(2) > div > div > div > input"
             const confirmPasswordInput = "form > div:nth-child(4) > div > div > div > input"
 
-            await page.waitForSelector(usernameInput, {
-                timeout: 10000,
-                signal: undefined
-            })
-            await page.waitForSelector(passwordInput, {
-                timeout: 10000,
-                signal: undefined
-            })
-            await page.waitForSelector(confirmPasswordInput, {
-                timeout: 10000,
-                signal: undefined
-            })
+            await page.waitForSelector(usernameInput)
+            await page.waitForSelector(passwordInput)
+            await page.waitForSelector(confirmPasswordInput)
 
             await page.type(usernameInput, username)
             await page.type(passwordInput, accountsPassword)
             await page.type(confirmPasswordInput, accountsPassword)
 
             const registerButton = "form > div:nth-child(6) > button"
-            await page.waitForSelector(registerButton, {
-                timeout: 10000,
-                signal: undefined
-            })
+            await page.waitForSelector(registerButton)
             await page.click(registerButton)
 
             await page.evaluate(async () => await new Promise(resolve => setTimeout(resolve, 2000)))
-            await page.goto(depositLink, {
-                waitUntil: "domcontentloaded"
-            })
+            await page.goto(depositLink)
 
             const depositAmountElement = 'div > div > div > div > div > div > div > input'
-            await page.waitForSelector(depositAmountElement, {
-                timeout: 10000,
-                signal: undefined
-            })
+            await page.waitForSelector(depositAmountElement)
             await page.type(depositAmountElement, '10')
 
             const depositButton = "div > div > div > div > button"
-            await page.waitForSelector(depositButton, {
-                timeout: 10000,
-                signal: undefined
-            })
+            await page.waitForSelector(depositButton)
             await page.click(depositButton)
         } else if (platformModel === '2') {
             await page.reload()
