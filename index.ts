@@ -151,14 +151,6 @@ async function createAccount({
         await neverStop()
     } catch (e) {
         console.log(e)
-        await browser?.close()
-        await createAccount({
-            link,
-            proxy,
-            accountsPassword,
-            platformModel,
-            index
-        })
     }
 }
 
