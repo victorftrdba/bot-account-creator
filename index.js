@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = require("puppeteer");
 const faker_1 = require("@faker-js/faker");
+const fs = require("fs");
 const proxyChain = require('proxy-chain');
-const rlSync = require('readline-sync');
 process.on('uncaughtException', async () => {
     await Promise.all(browsers.map(async (b) => b === null || b === void 0 ? void 0 : b.close()));
 });
@@ -12,46 +12,32 @@ process.on('SIGINT', async () => {
 });
 const browsers = [];
 (async () => {
-    const link = rlSync.question('Informe o link da plataforma: \n', {
-        hideEchoBack: false,
-    });
-    const proxy = rlSync.question('Informe a proxy: \n', {
-        hideEchoBack: false,
-    });
-    const quantities = rlSync.question('Quantidade de contas para criar: \n', {
-        hideEchoBack: false,
-    });
-    const accountsPassword = rlSync.question('Informe a senha para as contas: \n', {
-        hideEchoBack: false,
-    });
-    const platformModel = rlSync.question('Modelo da plataforma (1 ou 2): \n', {
-        hideEchoBack: false,
-    });
+    const { link, proxy, quantidade_contas, senha_contas, modelo_plataforma } = JSON.parse(Buffer.from(fs.readFileSync("./configs/config.json")).toString('utf8'));
     const promises = [];
-    for (let i = 0; i < parseInt(quantities); i++) {
+    for (let i = 0; i < parseInt(quantidade_contas); i++) {
         promises.push(createAccount({
             link,
             proxy,
-            accountsPassword,
-            platformModel,
+            accountsPassword: senha_contas,
+            platformModel: modelo_plataforma,
             index: i
         }));
     }
     await Promise.allSettled(promises);
 })();
-// function getWindowPosition(index: number, step: number, resetValue: number): number {
-//     return (index * step) % resetValue;
-// }
-// function getWindowPositionYByIndexMultiple(index: number) {
-//     return index % 3 === 0 ? 0 : 500
-// }
+function getWindowPosition(index, step, resetValue) {
+    return (index * step) % resetValue;
+}
+function getWindowPositionYByIndexMultiple(index) {
+    return index % 3 === 0 ? 0 : 500;
+}
 async function createAccount({ link, proxy, accountsPassword, platformModel, index }) {
     var _a, _b, _c, _d;
     const mainLink = (_d = (_c = (_a = link.replace) === null || _a === void 0 ? void 0 : (_b = _a.call(link, "https://", "")).split) === null || _c === void 0 ? void 0 : _c.call(_b, "/")) === null || _d === void 0 ? void 0 : _d[0];
     const depositLink = `https://${mainLink}/deposit`;
-    // const step = 350;
-    //const resetValue = 1750;
-    // const show4WindowsSideBySide = `--window-position=${getWindowPosition(index, step, resetValue)},${getWindowPositionYByIndexMultiple(index)}`
+    const step = 350;
+    const resetValue = 1750;
+    const show4WindowsSideBySide = `--window-position=${getWindowPosition(index, step, resetValue)},${getWindowPositionYByIndexMultiple(index)}`;
     const browser = await puppeteer_1.default.launch({
         headless: false,
         defaultViewport: null,
@@ -68,7 +54,7 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, ind
             '--disable-dev-profile',
             '--start-maximized',
             '--disable-infobars',
-            // show4WindowsSideBySide,
+            show4WindowsSideBySide,
             '--window-size=250,500'
         ],
     });
@@ -78,7 +64,7 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, ind
         page.setDefaultTimeout(0);
         await page.goto(link);
         await page.reload();
-        const username = `${faker_1.faker.person.firstName().toLowerCase().substring(0, 8)}${faker_1.faker.string.numeric(3)}`;
+        const username = `${faker_1.faker.person.firstName().toLowerCase().substring(0, 8)}${faker_1.faker.person.lastName().toLowerCase().substring(0, 8)}`;
         if (platformModel === '1') {
             const usernameInput = "form > div:nth-child(1) > div > div > div > input";
             const passwordInput = "form > div:nth-child(2) > div > div > div > input";
