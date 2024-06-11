@@ -48,13 +48,13 @@ const browsers: Browser[] = [];
     await Promise.allSettled(promises)
 })()
 
-// function getWindowPosition(index: number, step: number, resetValue: number): number {
-//     return (index * step) % resetValue;
-// }
+function getWindowPosition(index: number, step: number, resetValue: number): number {
+    return (index * step) % resetValue;
+}
 
-// function getWindowPositionYByIndexMultiple(index: number) {
-//     return index % 3 === 0 ? 0 : 500
-// }
+function getWindowPositionYByIndexMultiple(index: number) {
+    return index % 3 === 0 ? 0 : 500
+}
 
 async function createAccount({
                                  link,
@@ -72,9 +72,9 @@ async function createAccount({
     const mainLink = link.replace?.("https://", "").split?.("/")?.[0]
     const depositLink = `https://${mainLink}/deposit`
 
-    // const step = 350;
-    //const resetValue = 1750;
-    // const show4WindowsSideBySide = `--window-position=${getWindowPosition(index, step, resetValue)},${getWindowPositionYByIndexMultiple(index)}`
+    const step = 350;
+    const resetValue = 1750;
+    const show4WindowsSideBySide = `--window-position=${getWindowPosition(index, step, resetValue)},${getWindowPositionYByIndexMultiple(index)}`
 
     const browser = await puppeteer.launch({
         headless: false,
@@ -92,7 +92,7 @@ async function createAccount({
             '--disable-dev-profile',
             '--start-maximized',
             '--disable-infobars',
-            // show4WindowsSideBySide,
+            show4WindowsSideBySide,
             '--window-size=250,500'
         ],
     });
@@ -103,7 +103,7 @@ async function createAccount({
         page.setDefaultTimeout(0)
         await page.goto(link)
         await page.reload()
-        const username = `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.string.numeric(3)}`
+        const username = `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.person.lastName().toLowerCase().substring(0, 8)}`
 
         if (platformModel === '1') {
             const usernameInput = "form > div:nth-child(1) > div > div > div > input"
