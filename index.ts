@@ -95,7 +95,7 @@ async function createAccount({
         page.setDefaultTimeout(0)
         await page.goto(link)
         await page.reload()
-        const username = `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.person.lastName().toLowerCase().substring(0, 8)}`
+        const username = `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.person.lastName().toLowerCase().substring(0, 8).replace('-', '')}`
 
         if (platformModel === '1') {
             const usernameInput = "form > div:nth-child(1) > div > div > div > input"
