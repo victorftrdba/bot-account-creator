@@ -1,8 +1,8 @@
 import puppeteer, {Browser, Page} from 'puppeteer';
 import {faker} from "@faker-js/faker";
+import * as fs from "fs"
 
 const proxyChain = require('proxy-chain');
-const rlSync = require('readline-sync');
 
 process.on('uncaughtException', async () => {
     await Promise.all(
@@ -19,29 +19,21 @@ process.on('SIGINT', async () => {
 const browsers: Browser[] = [];
 
 (async () => {
-    const link = rlSync.question('Informe o link da plataforma: \n', {
-        hideEchoBack: false,
-    })
-    const proxy = rlSync.question('Informe a proxy: \n', {
-        hideEchoBack: false,
-    })
-    const quantities = rlSync.question('Quantidade de contas para criar: \n', {
-        hideEchoBack: false,
-    })
-    const accountsPassword = rlSync.question('Informe a senha para as contas: \n', {
-        hideEchoBack: false,
-    })
-    const platformModel = rlSync.question('Modelo da plataforma (1 ou 2): \n', {
-        hideEchoBack: false,
-    })
+    const { 
+        link, 
+        proxy,
+        quantidade_contas,
+        senha_contas,
+        modelo_plataforma
+    } = JSON.parse(Buffer.from(fs.readFileSync("./configs/config.json")).toString('utf8'))
 
     const promises = []
-    for (let i = 0; i < parseInt(quantities); i++) {
+    for (let i = 0; i < parseInt(quantidade_contas); i++) {
         promises.push(createAccount({
             link,
             proxy,
-            accountsPassword,
-            platformModel,
+            accountsPassword: senha_contas,
+            platformModel: modelo_plataforma,
             index: i
         }))
     }
