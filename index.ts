@@ -1,6 +1,7 @@
 import puppeteer, {Browser, Page} from 'puppeteer';
 import {faker} from "@faker-js/faker";
 import * as fs from "fs"
+import { userAgents } from './user-agents';
 
 const proxyChain = require('proxy-chain');
 
@@ -67,6 +68,7 @@ async function createAccount({
     const step = 350;
     const resetValue = 1750;
     const show4WindowsSideBySide = `--window-position=${getWindowPosition(index, step, resetValue)},${getWindowPositionYByIndexMultiple(index)}`
+    const userAgent = userAgents[Math.floor(Math.random() * userAgents.length)]
 
     const browser = await puppeteer.launch({
         headless: false,
@@ -82,19 +84,21 @@ async function createAccount({
             '--disable-breakpad',
             '--disable-hang-monitor',
             '--disable-dev-profile',
-            '--start-maximized',
             '--disable-infobars',
             show4WindowsSideBySide,
-            '--window-size=250,500'
+            '--window-size=250,600',
+            `--user-agent=${userAgent}`
         ],
     });
 
     try {
         const [page] = await browser.pages();
+        await page.setUserAgent(userAgent)
         page.setDefaultNavigationTimeout(0);
         page.setDefaultTimeout(0)
-        await page.goto(link)
-        await page.reload()
+        await page.goto(link, {
+            waitUntil: ['networkidle0', 'domcontentloaded', 'load']
+        })
         const username = `${faker.person.firstName().toLowerCase().substring(0, 8)}${faker.person.lastName().toLowerCase().substring(0, 8).replace('-', '')}`
 
         if (platformModel === '1') {
@@ -125,25 +129,27 @@ async function createAccount({
             await page.waitForSelector(depositButton)
             await page.click(depositButton)
         } else if (platformModel === '2') {
-            await page.reload()
+            await page.waitForSelector("#js_header > div > div > div > div:nth-child(2)")
+            await clickOnElement(page, "#js_header > div > div > div > div:nth-child(2)")
 
-            const usernameInput = "form > div > div > div > div > div:nth-child(1) > div > div > div > span > span > input"
-            const passwordInput = "form > div > div > div > div > div:nth-child(2) > div > div > div > span > span > input"
-            const confirmPasswordInput = "form > div > div > div > div > div:nth-child(4) > div > div > div > span > span > input"
+            const usernameInput = "form > div:nth-child(1) > div > div > div > div > input"
+            const passwordInput = "form > div:nth-child(2) > div > div > div > div > input"
+            const confirmPasswordInput = "form > div:nth-child(4) > div > div > div > div > input"
+            const nameInput = "form > div:nth-child(5) > div > div > div > div > input"
 
-            await page.waitForSelector(usernameInput)
-            await page.waitForSelector(passwordInput)
-            await page.waitForSelector(confirmPasswordInput)
+            await page.evaluate(async () => await new Promise(resolve => setTimeout(resolve, 2000)))
 
             await page.type(usernameInput, username)
             await page.type(passwordInput, accountsPassword)
             await page.type(confirmPasswordInput, accountsPassword)
+            await page.type(nameInput, faker.person.fullName())
 
-            await clickWithMouseOnElement(page, "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div > div > div.ant-row-flex.ant-row-flex-center.ant-row-flex-middle > button")
-            await clickOnElement(page, "div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-body > div > div > div.closeIcon > img")
-            await clickOnElement(page, ".ant-btn-primary")
-            await clickWithMouseOnElement(page, "section > div > div > div > div > div > div:nth-child(3) > section > div > ul > li:nth-child(1)")
-            await clickWithMouseOnElement(page, "section > div.common-tabs-content > section > div > div > div > div > div > button")
+            await clickWithMouseOnElement(page, "#js_login > div > div > div:nth-child(3) > button")
+            await page.evaluate(async () => await new Promise(resolve => setTimeout(resolve, 2000)))
+            await page.reload()
+            await clickWithMouseOnElement(page, ".cms-mango-popup > div > div > div > div> div > div:nth-child(3)")
+            await clickWithMouseOnElement(page, ".van-popup > div:nth-child(2) > div > div:nth-child(2) > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(1)")
+            await clickOnElement(page, ".van-popup > div:nth-child(2) > div > div:nth-child(2) > div > div:nth-child(3) > div:nth-child(3) > button")
         }
 
         browsers.push(browser)
