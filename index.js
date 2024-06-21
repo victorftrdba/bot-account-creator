@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = require("puppeteer");
 const faker_1 = require("@faker-js/faker");
 const fs = require("fs");
+const user_agents_1 = require("./user-agents");
 const proxyChain = require('proxy-chain');
 process.on('uncaughtException', async () => {
     await Promise.all(browsers.map(async (b) => b === null || b === void 0 ? void 0 : b.close()));
@@ -38,6 +39,7 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, ind
     const step = 350;
     const resetValue = 1750;
     const show4WindowsSideBySide = `--window-position=${getWindowPosition(index, step, resetValue)},${getWindowPositionYByIndexMultiple(index)}`;
+    const userAgent = user_agents_1.userAgents[Math.floor(Math.random() * user_agents_1.userAgents.length)];
     const browser = await puppeteer_1.default.launch({
         headless: false,
         defaultViewport: null,
@@ -55,16 +57,18 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, ind
             '--start-maximized',
             '--disable-infobars',
             show4WindowsSideBySide,
-            '--window-size=250,500'
+            '--window-size=250,500',
+            `--user-agent=${userAgent}`
         ],
     });
     try {
         const [page] = await browser.pages();
+        await page.setUserAgent(userAgent);
         page.setDefaultNavigationTimeout(0);
         page.setDefaultTimeout(0);
         await page.goto(link);
         await page.reload();
-        const username = `${faker_1.faker.person.firstName().toLowerCase().substring(0, 8)}${faker_1.faker.person.lastName().toLowerCase().substring(0, 8)}`;
+        const username = `${faker_1.faker.person.firstName().toLowerCase().substring(0, 8)}${faker_1.faker.person.lastName().toLowerCase().substring(0, 8).replace('-', '')}`;
         if (platformModel === '1') {
             const usernameInput = "form > div:nth-child(1) > div > div > div > input";
             const passwordInput = "form > div:nth-child(2) > div > div > div > input";
@@ -109,14 +113,6 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, ind
     }
     catch (e) {
         console.log(e);
-        await (browser === null || browser === void 0 ? void 0 : browser.close());
-        await createAccount({
-            link,
-            proxy,
-            accountsPassword,
-            platformModel,
-            index
-        });
     }
 }
 async function clickWithMouseOnElement(page, path) {

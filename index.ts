@@ -1,6 +1,7 @@
 import puppeteer, {Browser, Page} from 'puppeteer';
 import {faker} from "@faker-js/faker";
 import * as fs from "fs"
+import { userAgents } from './user-agents';
 
 const proxyChain = require('proxy-chain');
 
@@ -67,6 +68,7 @@ async function createAccount({
     const step = 350;
     const resetValue = 1750;
     const show4WindowsSideBySide = `--window-position=${getWindowPosition(index, step, resetValue)},${getWindowPositionYByIndexMultiple(index)}`
+    const userAgent = userAgents[Math.floor(Math.random() * userAgents.length)]
 
     const browser = await puppeteer.launch({
         headless: false,
@@ -85,12 +87,14 @@ async function createAccount({
             '--start-maximized',
             '--disable-infobars',
             show4WindowsSideBySide,
-            '--window-size=250,500'
+            '--window-size=250,500',
+            `--user-agent=${userAgent}`
         ],
     });
 
     try {
         const [page] = await browser.pages();
+        await page.setUserAgent(userAgent)
         page.setDefaultNavigationTimeout(0);
         page.setDefaultTimeout(0)
         await page.goto(link)
