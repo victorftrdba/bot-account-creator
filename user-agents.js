@@ -902,4 +902,3 @@ exports.userAgents = [
     "Opera/9.80 (X11; Linux x86_64; U; pl) Presto/2.7.62 Version/11.00",
     "Opera/9.80 (X11; U; Linux i686; en-US; rv:1.9.2.3) Presto/2.2.15 Version/10.10"
 ];
-//# sourceMappingURL=user-agents.js.map

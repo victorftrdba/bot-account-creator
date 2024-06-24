@@ -13,7 +13,7 @@ process.on('SIGINT', async () => {
 });
 const browsers = [];
 (async () => {
-    const { link, proxy, quantidade_contas, senha_contas, modelo_plataforma } = JSON.parse(Buffer.from(fs.readFileSync("./configs/config.json")).toString('utf8'));
+    const { link, proxy, quantidade_contas, senha_contas, modelo_plataforma, preencher_nome } = JSON.parse(Buffer.from(fs.readFileSync("./configs/config.json")).toString('utf8'));
     const promises = [];
     for (let i = 0; i < parseInt(quantidade_contas); i++) {
         promises.push(createAccount({
@@ -21,6 +21,7 @@ const browsers = [];
             proxy,
             accountsPassword: senha_contas,
             platformModel: modelo_plataforma,
+            isWaitForName: preencher_nome,
             index: i
         }));
     }
@@ -32,7 +33,7 @@ function getWindowPosition(index, step, resetValue) {
 function getWindowPositionYByIndexMultiple(index) {
     return index % 3 === 0 ? 0 : 500;
 }
-async function createAccount({ link, proxy, accountsPassword, platformModel, index }) {
+async function createAccount({ link, proxy, accountsPassword, platformModel, isWaitForName, index }) {
     var _a, _b, _c, _d;
     const mainLink = (_d = (_c = (_a = link.replace) === null || _a === void 0 ? void 0 : (_b = _a.call(link, "https://", "")).split) === null || _c === void 0 ? void 0 : _c.call(_b, "/")) === null || _d === void 0 ? void 0 : _d[0];
     const depositLink = `https://${mainLink}/deposit`;
@@ -54,10 +55,9 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, ind
             '--disable-breakpad',
             '--disable-hang-monitor',
             '--disable-dev-profile',
-            '--start-maximized',
             '--disable-infobars',
             show4WindowsSideBySide,
-            '--window-size=250,500',
+            '--window-size=250,600',
             `--user-agent=${userAgent}`
         ],
     });
@@ -66,8 +66,9 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, ind
         await page.setUserAgent(userAgent);
         page.setDefaultNavigationTimeout(0);
         page.setDefaultTimeout(0);
-        await page.goto(link);
-        await page.reload();
+        await page.goto(link, {
+            waitUntil: ['networkidle0', 'domcontentloaded', 'load']
+        });
         const username = `${faker_1.faker.person.firstName().toLowerCase().substring(0, 8)}${faker_1.faker.person.lastName().toLowerCase().substring(0, 8).replace('-', '')}`;
         if (platformModel === '1') {
             const usernameInput = "form > div:nth-child(1) > div > div > div > input";
@@ -76,12 +77,33 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, ind
             await page.waitForSelector(usernameInput);
             await page.waitForSelector(passwordInput);
             await page.waitForSelector(confirmPasswordInput);
-            await page.type(usernameInput, username);
+            if (!isWaitForName) {
+                await page.type(usernameInput, username);
+            }
             await page.type(passwordInput, accountsPassword);
             await page.type(confirmPasswordInput, accountsPassword);
+            await page.waitForFunction((usernameInput, isWaitForName) => {
+                var _a, _b;
+                if (!isWaitForName) {
+                    return true;
+                }
+                return ((_b = (_a = document.querySelector(usernameInput)) === null || _a === void 0 ? void 0 : _a.value) === null || _b === void 0 ? void 0 : _b.length) > 6;
+            }, {
+                polling: 300
+            }, usernameInput, isWaitForName);
             const registerButton = "form > div:nth-child(6) > button";
             await page.waitForSelector(registerButton);
-            await page.click(registerButton);
+            if (!isWaitForName) {
+                await page.click(registerButton);
+            }
+            await page.evaluate(async (registerButton) => {
+                return await new Promise(resolve => {
+                    var _a;
+                    (_a = document.querySelector(registerButton)) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
+                        resolve(true);
+                    });
+                });
+            }, registerButton);
             await page.evaluate(async () => await new Promise(resolve => setTimeout(resolve, 2000)));
             await page.goto(depositLink);
             const depositAmountElement = 'div > div > div > div > div > div > div > input';
@@ -92,21 +114,45 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, ind
             await page.click(depositButton);
         }
         else if (platformModel === '2') {
-            await page.reload();
-            const usernameInput = "form > div > div > div > div > div:nth-child(1) > div > div > div > span > span > input";
-            const passwordInput = "form > div > div > div > div > div:nth-child(2) > div > div > div > span > span > input";
-            const confirmPasswordInput = "form > div > div > div > div > div:nth-child(4) > div > div > div > span > span > input";
-            await page.waitForSelector(usernameInput);
-            await page.waitForSelector(passwordInput);
-            await page.waitForSelector(confirmPasswordInput);
-            await page.type(usernameInput, username);
+            await page.waitForSelector("#js_header > div > div > div > div:nth-child(2)");
+            await clickOnElement(page, "#js_header > div > div > div > div:nth-child(2)");
+            const usernameInput = "form > div:nth-child(1) > div > div > div > div > input";
+            const passwordInput = "form > div:nth-child(2) > div > div > div > div > input";
+            const confirmPasswordInput = "form > div:nth-child(4) > div > div > div > div > input";
+            const nameInput = "form > div:nth-child(5) > div > div > div > div > input";
+            await page.evaluate(async () => await new Promise(resolve => setTimeout(resolve, 2000)));
+            if (!isWaitForName) {
+                await page.type(usernameInput, username);
+            }
             await page.type(passwordInput, accountsPassword);
             await page.type(confirmPasswordInput, accountsPassword);
-            await clickWithMouseOnElement(page, "div > div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div > div > div.ant-row-flex.ant-row-flex-center.ant-row-flex-middle > button");
-            await clickOnElement(page, "div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-body > div > div > div.closeIcon > img");
-            await clickOnElement(page, ".ant-btn-primary");
-            await clickWithMouseOnElement(page, "section > div > div > div > div > div > div:nth-child(3) > section > div > ul > li:nth-child(1)");
-            await clickWithMouseOnElement(page, "section > div.common-tabs-content > section > div > div > div > div > div > button");
+            await page.type(nameInput, faker_1.faker.person.fullName());
+            await page.waitForFunction((usernameInput, isWaitForName) => {
+                var _a, _b;
+                if (!isWaitForName) {
+                    return true;
+                }
+                return ((_b = (_a = document.querySelector(usernameInput)) === null || _a === void 0 ? void 0 : _a.value) === null || _b === void 0 ? void 0 : _b.length) > 6;
+            }, {
+                polling: 300
+            }, usernameInput, isWaitForName);
+            const registerButton = "#js_login > div > div > div:nth-child(3) > button";
+            if (!isWaitForName) {
+                await clickWithMouseOnElement(page, registerButton);
+            }
+            await page.evaluate(async (registerButton) => {
+                return await new Promise(resolve => {
+                    var _a;
+                    (_a = document.querySelector(registerButton)) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
+                        resolve(true);
+                    });
+                });
+            }, registerButton);
+            await page.evaluate(async () => await new Promise(resolve => setTimeout(resolve, 2000)));
+            await page.reload();
+            await clickWithMouseOnElement(page, ".cms-mango-popup > div > div > div > div> div > div:nth-child(3)");
+            await clickWithMouseOnElement(page, ".van-popup > div:nth-child(2) > div > div:nth-child(2) > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(1)");
+            await clickOnElement(page, ".van-popup > div:nth-child(2) > div > div:nth-child(2) > div > div:nth-child(3) > div:nth-child(3) > button");
         }
         browsers.push(browser);
         await neverStop();
@@ -140,4 +186,3 @@ async function clickOnElement(page, path) {
         }, 1000);
     }), path);
 }
-//# sourceMappingURL=index.js.map

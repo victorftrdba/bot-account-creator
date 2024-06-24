@@ -134,7 +134,18 @@ async function createAccount({
 
             const registerButton = "form > div:nth-child(6) > button"
             await page.waitForSelector(registerButton)
-            await page.click(registerButton)
+            
+            if (!isWaitForName) {
+                await page.click(registerButton)
+            }
+
+            await page.evaluate(async (registerButton) => {
+                return await new Promise(resolve => {
+                    document.querySelector(registerButton)?.addEventListener('click', () => {
+                        resolve(true)
+                    })
+                })
+            }, registerButton)
 
             await page.evaluate(async () => await new Promise(resolve => setTimeout(resolve, 2000)))
             await page.goto(depositLink)
@@ -176,7 +187,20 @@ async function createAccount({
                 polling: 300
             }, usernameInput, isWaitForName)
 
-            await clickWithMouseOnElement(page, "#js_login > div > div > div:nth-child(3) > button")
+            const registerButton = "#js_login > div > div > div:nth-child(3) > button"
+
+            if (!isWaitForName) {
+                await clickWithMouseOnElement(page, registerButton)
+            }
+
+            await page.evaluate(async (registerButton) => {
+                return await new Promise(resolve => {
+                    document.querySelector(registerButton)?.addEventListener('click', () => {
+                        resolve(true)
+                    })
+                })
+            }, registerButton)
+
             await page.evaluate(async () => await new Promise(resolve => setTimeout(resolve, 2000)))
             await page.reload()
             await clickWithMouseOnElement(page, ".cms-mango-popup > div > div > div > div> div > div:nth-child(3)")
