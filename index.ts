@@ -25,7 +25,8 @@ const browsers: Browser[] = [];
         proxy,
         quantidade_contas,
         senha_contas,
-        modelo_plataforma
+        modelo_plataforma,
+        preencher_nome
     } = JSON.parse(Buffer.from(fs.readFileSync("./configs/config.json")).toString('utf8'))
 
     const promises = []
@@ -35,6 +36,7 @@ const browsers: Browser[] = [];
             proxy,
             accountsPassword: senha_contas,
             platformModel: modelo_plataforma,
+            isWaitForName: preencher_nome,
             index: i
         }))
     }
@@ -54,12 +56,14 @@ async function createAccount({
                                  proxy,
                                  accountsPassword,
                                  platformModel,
+                                 isWaitForName,
                                  index
                              }: {
-    link: string,
-    proxy: string,
-    accountsPassword: string,
+    link: string
+    proxy: string
+    accountsPassword: string
     platformModel: string
+    isWaitForName: string
     index: number
 }) {
     const mainLink = link.replace?.("https://", "").split?.("/")?.[0]
@@ -110,9 +114,23 @@ async function createAccount({
             await page.waitForSelector(passwordInput)
             await page.waitForSelector(confirmPasswordInput)
 
-            await page.type(usernameInput, username)
+            if (!isWaitForName) {
+                await page.type(usernameInput, username)
+            }
             await page.type(passwordInput, accountsPassword)
             await page.type(confirmPasswordInput, accountsPassword)
+
+            await page.waitForFunction((usernameInput, isWaitForName) => {
+                if (!isWaitForName) {
+                    return true;
+                }
+
+                return (document.querySelector(usernameInput) as any)
+                    ?.value
+                    ?.length > 6
+            }, {
+                polling: 300
+            }, usernameInput, isWaitForName)
 
             const registerButton = "form > div:nth-child(6) > button"
             await page.waitForSelector(registerButton)
@@ -139,10 +157,24 @@ async function createAccount({
 
             await page.evaluate(async () => await new Promise(resolve => setTimeout(resolve, 2000)))
 
-            await page.type(usernameInput, username)
+            if (!isWaitForName) {
+                await page.type(usernameInput, username)
+            }
             await page.type(passwordInput, accountsPassword)
             await page.type(confirmPasswordInput, accountsPassword)
             await page.type(nameInput, faker.person.fullName())
+
+            await page.waitForFunction((usernameInput, isWaitForName) => {
+                if (!isWaitForName) {
+                    return true;
+                }
+
+                return (document.querySelector(usernameInput) as any)
+                    ?.value
+                    ?.length > 6
+            }, {
+                polling: 300
+            }, usernameInput, isWaitForName)
 
             await clickWithMouseOnElement(page, "#js_login > div > div > div:nth-child(3) > button")
             await page.evaluate(async () => await new Promise(resolve => setTimeout(resolve, 2000)))
