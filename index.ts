@@ -250,26 +250,16 @@ async function createAccount({
         async () => await new Promise((resolve) => setTimeout(resolve, 5000))
       );
       await page.reload();
-      setInterval(async () => {
-        await page.evaluate(async (registerButton, isWaitForName) => {
-          return (
-            document.querySelector(
-              ".cms-mango-popup > div > div > div > div > div > div > div:nth-child(3) > span"
-            ) !== null
-          );
-        });
-
-        await clickWithMouseOnElement(
-          page,
-          ".cms-mango-popup > div > div > div > div > div > div > div:nth-child(3) > span"
-        );
-      }, 100);
       await clickWithMouseOnElement(
         page,
         ".cms-mango-popup > div > div > div > div > div > div:nth-child(3)"
       );
       await page.evaluate(
         async () => await new Promise((resolve) => setTimeout(resolve, 2000))
+      );
+      await clickWithMouseOnElement(
+        page,
+        ".cms-mango-popup > div > div > div > div > div > div > div:nth-child(3) > span"
       );
       await clickWithMouseOnElement(
         page,
