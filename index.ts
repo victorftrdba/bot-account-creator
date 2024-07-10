@@ -247,7 +247,7 @@ async function createAccount({
       );
 
       await page.evaluate(
-        async () => await new Promise((resolve) => setTimeout(resolve, 2000))
+        async () => await new Promise((resolve) => setTimeout(resolve, 5000))
       );
       await page.reload();
       await clickWithMouseOnElement(
