@@ -250,7 +250,7 @@ async function createAccount({
         async () => await new Promise((resolve) => setTimeout(resolve, 5000))
       );
       await page.reload();
-      setInterval(() => {
+      setInterval(async () => {
         await clickWithMouseOnElement(
           page,
           ".cms-mango-popup > div > div > div > div > div > div > div:nth-child(3) > span"
