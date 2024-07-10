@@ -98,7 +98,7 @@ async function createAccount({
       "--disable-dev-profile",
       "--disable-infobars",
       show4WindowsSideBySide,
-      "--window-size=250,700",
+      "--window-size=250,750",
       `--user-agent=${userAgent}`,
     ],
   });
