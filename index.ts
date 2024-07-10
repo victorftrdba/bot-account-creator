@@ -254,9 +254,15 @@ async function createAccount({
         page,
         ".cms-mango-popup > div > div > div > div > div > div:nth-child(3)"
       );
+      await page.evaluate(
+        async () => await new Promise((resolve) => setTimeout(resolve, 2000))
+      );
       await clickWithMouseOnElement(
         page,
         ".van-popup > div:nth-child(2) > div > div:nth-child(2) > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(1)"
+      );
+      await page.evaluate(
+        async () => await new Promise((resolve) => setTimeout(resolve, 2000))
       );
       await clickOnElement(
         page,
