@@ -251,6 +251,14 @@ async function createAccount({
       );
       await page.reload();
       setInterval(async () => {
+        await page.evaluate(async (registerButton, isWaitForName) => {
+          return (
+            document.querySelector(
+              ".cms-mango-popup > div > div > div > div > div > div > div:nth-child(3) > span"
+            ) !== null
+          );
+        });
+
         await clickWithMouseOnElement(
           page,
           ".cms-mango-popup > div > div > div > div > div > div > div:nth-child(3) > span"
