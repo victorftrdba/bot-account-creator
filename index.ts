@@ -111,7 +111,7 @@ async function createAccount({
 
         await page.waitForFunction(async () => {
             function clickOnElement(path: string) {
-                return new Promise(resolve => {
+                return new Promise(async resolve => {
                     const element = document.querySelector(path) as any;
                     if (!element) {
                         console.log(`${path} not found`);
@@ -147,7 +147,11 @@ async function createAccount({
         await page.waitForFunction(async () => {
             function isElementRendered(paths: string[]) {
                 return new Promise(resolve => {
-                    const element = paths.map(path => document.querySelector(path) as any).find(Boolean);
+                    const element = paths?.map(path => document.querySelector(path) as any)?.find(Boolean);
+                    const isAllUndefined = paths?.map(path => document.querySelector(path) as any)?.every(p => !p)
+                    if (isAllUndefined) {
+                        resolve(true)
+                    }
                     if (!element) {
                         console.log(`${element} not found`);
                         resolve(false);
@@ -159,13 +163,14 @@ async function createAccount({
 
             return await isElementRendered([
                 "div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div > div.login-register-body",
-                "div.right-content-wrapper > div.header > div.v--modal-overlay > div > div.v--modal-box.v--modal"
+                "div.right-content-wrapper > div.header > div.v--modal-overlay > div > div.v--modal-box.v--modal",
+                "body > div > div > div > div > div"
             ])
         });
 
         await page.waitForFunction(async (username, accountsPassword) => {
             function clickOnElement(path: string) {
-                return new Promise(resolve => {
+                return new Promise(async resolve => {
                     const element = document.querySelector(path) as any;
                     if (!element) {
                         console.log(`${path} not found`);
@@ -178,15 +183,18 @@ async function createAccount({
             }
 
             function setValueOnElement(path: string, value: string) {
-                return new Promise(resolve => {
+                return new Promise(async resolve => {
                     const element = document.querySelector(path) as any;
                     if (!element) {
                         console.log(`${path} not found`);
                         resolve(false);
                     }
+                    Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set?.call(element, value);
                     for (let i = 0; i < value.length; i++) {
-                        element.value += value[i];
-                        element.dispatchEvent(new Event("input"));
+                        element.dispatchEvent(new Event("input", {bubbles: true, cancelable: false, composed: true}));
+                        element.dispatchEvent(new Event("change", {bubbles: true, cancelable: false, composed: true}));
+                        element.dispatchEvent(new Event("blur", {bubbles: true, cancelable: false, composed: true}));
+                        await new Promise(resolve => setTimeout(resolve, 100));
                     }
                     console.log(`${path} found`);
                     resolve(true);
@@ -197,18 +205,21 @@ async function createAccount({
                 [
                     "form > div > div:nth-child(2) > div > div > div > span > div > div > div > ul > li > div > input",
                     "form > div:nth-child(1) > div:nth-child(1) > div > input",
+                    "form > div:nth-child(1) > div > div > div > input"
                 ].map(async (path) => {
                     return await setValueOnElement(path, username)
                 }),
                 [
                     "form > div > div:nth-child(4) > div > div > div > span > span > input",
-                    "form > div:nth-child(1) > div:nth-child(2) > div > input"
+                    "form > div:nth-child(1) > div:nth-child(2) > div > input",
+                    "form > div:nth-child(2) > div > div > div > input"
                 ].map(async (path) => {
                     return await setValueOnElement(path, accountsPassword)
                 }),
                 [
                     "form > div > div:nth-child(6) > div > div > div > span > span > input",
-                    "form > div:nth-child(1) > div:nth-child(3) > div > input"
+                    "form > div:nth-child(1) > div:nth-child(3) > div > input",
+                    "form > div:nth-child(4) > div > div > div > input"
                 ].map(async (path) => {
                     return await setValueOnElement(path, accountsPassword)
                 })
@@ -219,7 +230,8 @@ async function createAccount({
             await Promise.all([
                 [
                     "div.right-content-wrapper > div.header > div.v--modal-overlay > div > div.v--modal-box.v--modal > div > div.tcg_modal_body > div > div.register_wrapper.register-modal > div > div.form_container > form > div.form_item.reg-btn-wrap > button",
-                    "div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div > div.login-register-body > div:nth-child(4) > div:nth-child(2) > button"
+                    "div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div > div.login-register-body > div:nth-child(4) > div:nth-child(2) > button",
+                    "form > div:nth-child(6) > button",
                 ].map(async (path) => {
                     return await clickOnElement(path)
                 })
@@ -231,7 +243,11 @@ async function createAccount({
         await page.waitForFunction(async () => {
             function isElementRendered(paths: string[]) {
                 return new Promise(resolve => {
-                    const element = paths.map(path => document.querySelector(path) as any).find(Boolean);
+                    const element = paths?.map(path => document.querySelector(path) as any)?.find(Boolean);
+                    const isAllUndefined = paths?.map(path => document.querySelector(path) as any)?.every(p => !p)
+                    if (isAllUndefined) {
+                        resolve(true)
+                    }
                     if (!element) {
                         console.log(`${element} not found`);
                         resolve(false);
@@ -242,13 +258,14 @@ async function createAccount({
             }
 
             return await isElementRendered([
-                "div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary"
+                "body > div._modalBox_3bzvl_3 > div > div > div._delete_re3qb_19 > img",
+                "div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary",
             ])
         })
 
         await page.waitForFunction(async () => {
             function clickOnElement(path: string) {
-                return new Promise(resolve => {
+                return new Promise(async resolve => {
                     const element = document.querySelector(path) as any;
                     if (!element) {
                         console.log(`${path} not found`);
@@ -262,6 +279,7 @@ async function createAccount({
 
             await Promise.all([
                 [
+                    "body > div._modalBox_3bzvl_3 > div > div > div._delete_re3qb_19 > img",
                     "div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary"
                 ].map(async (path) => {
                     return await clickOnElement(path)
@@ -274,7 +292,11 @@ async function createAccount({
         await page.waitForFunction(async () => {
             function isElementRendered(paths: string[]) {
                 return new Promise(resolve => {
-                    const element = paths.map(path => document.querySelector(path) as any).find(Boolean);
+                    const element = paths?.map(path => document.querySelector(path) as any)?.find(Boolean);
+                    const isAllUndefined = paths?.map(path => document.querySelector(path) as any)?.every(p => !p)
+                    if (isAllUndefined) {
+                        resolve(true)
+                    }
                     if (!element) {
                         console.log(`${element} not found`);
                         resolve(false);
@@ -291,7 +313,7 @@ async function createAccount({
 
         await page.waitForFunction(async () => {
             function clickOnElement(path: string) {
-                return new Promise(resolve => {
+                return new Promise(async resolve => {
                     const element = document.querySelector(path) as any;
                     if (!element) {
                         console.log(`${path} not found`);
@@ -304,15 +326,18 @@ async function createAccount({
             }
 
             function setValueOnElement(path: string, value: string) {
-                return new Promise(resolve => {
+                return new Promise(async resolve => {
                     const element = document.querySelector(path) as any;
                     if (!element) {
                         console.log(`${path} not found`);
                         resolve(false);
                     }
+                    Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set?.call(element, value);
                     for (let i = 0; i < value.length; i++) {
-                        element.value += value[i];
-                        element.dispatchEvent(new Event("input"));
+                        element.dispatchEvent(new Event("input", {bubbles: true, cancelable: false, composed: true}));
+                        element.dispatchEvent(new Event("change", {bubbles: true, cancelable: false, composed: true}));
+                        element.dispatchEvent(new Event("blur", {bubbles: true, cancelable: false, composed: true}));
+                        await new Promise(resolve => setTimeout(resolve, 100));
                     }
                     console.log(`${path} found`);
                     resolve(true);
