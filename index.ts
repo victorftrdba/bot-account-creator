@@ -115,8 +115,17 @@ async function createAccount({
                     const element = document.querySelector(path) as any;
                     if (!element) {
                         console.log(`${path} not found`);
-                        resolve(false);
+                        return resolve(false);
                     }
+                    const {top, left, width, height} = element?.getBoundingClientRect() as DOMRect
+                    const clickEvt = new MouseEvent('click', {
+                        clientX: left + width / 2,
+                        clientY: top + height / 2,
+                        bubbles: true,
+                        cancelable: false,
+                        composed: true
+                    })
+                    element?.dispatchEvent(clickEvt);
                     element?.click();
                     console.log(`${path} found`);
                     resolve(true);
@@ -154,7 +163,7 @@ async function createAccount({
                     }
                     if (!element) {
                         console.log(`${element} not found`);
-                        resolve(false);
+                        return resolve(false);
                     }
                     console.log(`${element} found`);
                     resolve(true);
@@ -164,7 +173,8 @@ async function createAccount({
             return await isElementRendered([
                 "div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div > div.login-register-body",
                 "div.right-content-wrapper > div.header > div.v--modal-overlay > div > div.v--modal-box.v--modal",
-                "body > div > div > div > div > div"
+                "body > div > div > div > div > div",
+                "#accountRegisterModal"
             ])
         });
 
@@ -174,8 +184,17 @@ async function createAccount({
                     const element = document.querySelector(path) as any;
                     if (!element) {
                         console.log(`${path} not found`);
-                        resolve(false);
+                        return resolve(false);
                     }
+                    const {top, left, width, height} = element?.getBoundingClientRect() as DOMRect
+                    const clickEvt = new MouseEvent('click', {
+                        clientX: left + width / 2,
+                        clientY: top + height / 2,
+                        bubbles: true,
+                        cancelable: false,
+                        composed: true
+                    })
+                    element?.dispatchEvent(clickEvt);
                     element?.click();
                     console.log(`${path} found`);
                     resolve(true);
@@ -187,7 +206,7 @@ async function createAccount({
                     const element = document.querySelector(path) as any;
                     if (!element) {
                         console.log(`${path} not found`);
-                        resolve(false);
+                        return resolve(false);
                     }
                     Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set?.call(element, value);
                     for (let i = 0; i < value.length; i++) {
@@ -205,21 +224,24 @@ async function createAccount({
                 [
                     "form > div > div:nth-child(2) > div > div > div > span > div > div > div > ul > li > div > input",
                     "form > div:nth-child(1) > div:nth-child(1) > div > input",
-                    "form > div:nth-child(1) > div > div > div > input"
+                    "form > div:nth-child(1) > div > div > div > input",
+                    "form > div:nth-child(1) > div > div > div > div > input"
                 ].map(async (path) => {
                     return await setValueOnElement(path, username)
                 }),
                 [
                     "form > div > div:nth-child(4) > div > div > div > span > span > input",
                     "form > div:nth-child(1) > div:nth-child(2) > div > input",
-                    "form > div:nth-child(2) > div > div > div > input"
+                    "form > div:nth-child(2) > div > div > div > input",
+                    "form > div:nth-child(2) > div > div > div > div > input"
                 ].map(async (path) => {
                     return await setValueOnElement(path, accountsPassword)
                 }),
                 [
                     "form > div > div:nth-child(6) > div > div > div > span > span > input",
                     "form > div:nth-child(1) > div:nth-child(3) > div > input",
-                    "form > div:nth-child(4) > div > div > div > input"
+                    "form > div:nth-child(4) > div > div > div > input",
+                    "form > div:nth-child(4) > div > div > div > div > input"
                 ].map(async (path) => {
                     return await setValueOnElement(path, accountsPassword)
                 })
@@ -232,6 +254,7 @@ async function createAccount({
                     "div.right-content-wrapper > div.header > div.v--modal-overlay > div > div.v--modal-box.v--modal > div > div.tcg_modal_body > div > div.register_wrapper.register-modal > div > div.form_container > form > div.form_item.reg-btn-wrap > button",
                     "div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div > div.login-register-body > div:nth-child(4) > div:nth-child(2) > button",
                     "form > div:nth-child(6) > button",
+                    "#js_login > div > div > div:nth-child(3) > button"
                 ].map(async (path) => {
                     return await clickOnElement(path)
                 })
@@ -250,7 +273,7 @@ async function createAccount({
                     }
                     if (!element) {
                         console.log(`${element} not found`);
-                        resolve(false);
+                        return resolve(false);
                     }
                     console.log(`${element} found`);
                     resolve(true);
@@ -260,8 +283,11 @@ async function createAccount({
             return await isElementRendered([
                 "body > div._modalBox_3bzvl_3 > div > div > div._delete_re3qb_19 > img",
                 "div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary",
+                ".cms-mango-popup > div > div > div > div > div > div:nth-child(3)"
             ])
         })
+
+        await new Promise(resolve => setTimeout(resolve, 2000))
 
         await page.waitForFunction(async () => {
             function clickOnElement(path: string) {
@@ -269,8 +295,17 @@ async function createAccount({
                     const element = document.querySelector(path) as any;
                     if (!element) {
                         console.log(`${path} not found`);
-                        resolve(false);
+                        return resolve(false);
                     }
+                    const {top, left, width, height} = element?.getBoundingClientRect() as DOMRect
+                    const clickEvt = new MouseEvent('click', {
+                        clientX: left + width / 2,
+                        clientY: top + height / 2,
+                        bubbles: true,
+                        cancelable: false,
+                        composed: true
+                    })
+                    element?.dispatchEvent(clickEvt);
                     element?.click();
                     console.log(`${path} found`);
                     resolve(true);
@@ -280,7 +315,8 @@ async function createAccount({
             await Promise.all([
                 [
                     "body > div._modalBox_3bzvl_3 > div > div > div._delete_re3qb_19 > img",
-                    "div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary"
+                    "div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary",
+                    ".cms-mango-popup > div > div > div > div > div > div:nth-child(3)"
                 ].map(async (path) => {
                     return await clickOnElement(path)
                 })
@@ -288,6 +324,117 @@ async function createAccount({
 
             return true
         })
+
+        await new Promise(resolve => setTimeout(resolve, 2000))
+
+        await page.waitForFunction(async () => {
+            function clickOnElement(path: string) {
+                return new Promise(async resolve => {
+                    const element = document.querySelector(path) as any;
+                    if (!element) {
+                        console.log(`${path} not found`);
+                        return resolve(false);
+                    }
+                    const {top, left, width, height} = element?.getBoundingClientRect() as DOMRect
+                    const clickEvt = new MouseEvent('click', {
+                        clientX: left + width / 2,
+                        clientY: top + height / 2,
+                        bubbles: true,
+                        cancelable: false,
+                        composed: true
+                    })
+                    element?.dispatchEvent(clickEvt);
+                    element?.click();
+                    console.log(`${path} found`);
+                    resolve(true);
+                })
+            }
+
+            await Promise.all([
+                [
+                    ".cms-mango-popup:last-child > div > div > div > div > div > div > div:nth-child(3) > span"
+                ].map(async (path) => {
+                    return await clickOnElement(path)
+                })
+            ])
+
+            return true
+        })
+
+        await new Promise(resolve => setTimeout(resolve, 2000))
+
+        await page.waitForFunction(async () => {
+            function clickOnElement(path: string) {
+                return new Promise(async resolve => {
+                    const element = document.querySelector(path) as any;
+                    if (!element) {
+                        console.log(`${path} not found`);
+                        return resolve(false);
+                    }
+                    const {top, left, width, height} = element?.getBoundingClientRect() as DOMRect
+                    const clickEvt = new MouseEvent('click', {
+                        clientX: left + width / 2,
+                        clientY: top + height / 2,
+                        bubbles: true,
+                        cancelable: false,
+                        composed: true
+                    })
+                    element?.dispatchEvent(clickEvt);
+                    element?.click();
+                    console.log(`${path} found`);
+                    resolve(true);
+                })
+            }
+
+            await Promise.all([
+                [
+                    ".cms-mango-popup:last-child > div > div > div > div > div:nth-child(2)"
+                ].map(async (path) => {
+                    return await clickOnElement(path)
+                })
+            ])
+
+            return true
+        })
+
+        await new Promise(resolve => setTimeout(resolve, 2000))
+
+        await page.waitForFunction(async () => {
+            function clickOnElement(path: string) {
+                return new Promise(async resolve => {
+                    const element = document.querySelector(path) as any;
+                    if (!element) {
+                        console.log(`${path} not found`);
+                        return resolve(false);
+                    }
+                    const {top, left, width, height} = element?.getBoundingClientRect() as DOMRect
+                    const clickEvt = new MouseEvent('click', {
+                        clientX: left + width / 2,
+                        clientY: top + height / 2,
+                        bubbles: true,
+                        cancelable: false,
+                        composed: true
+                    })
+                    element?.dispatchEvent(clickEvt);
+                    element?.click();
+                    console.log(`${path} found`);
+                    resolve(true);
+                })
+            }
+
+            await Promise.all([
+                [
+                    "#js_header > div > div > div > div > div",
+                    "div > div > div > div > div > div > div:nth-child(2) > div:nth-child(2) > div"
+                ].map(async (path) => {
+                    return await clickOnElement(path)
+                })
+            ])
+
+            return true
+        })
+
+        await new Promise(resolve => setTimeout(resolve, 2000))
 
         await page.waitForFunction(async () => {
             function isElementRendered(paths: string[]) {
@@ -299,7 +446,7 @@ async function createAccount({
                     }
                     if (!element) {
                         console.log(`${element} not found`);
-                        resolve(false);
+                        return resolve(false);
                     }
                     console.log(`${element} found`);
                     resolve(true);
@@ -307,7 +454,9 @@ async function createAccount({
             }
 
             return await isElementRendered([
-                "div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div > div > div.e8siic_ICXmLcAr12pgU > div:nth-child(3) > section > div > div > span > input"
+                "div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div > div > div.e8siic_ICXmLcAr12pgU > div:nth-child(3) > section > div > div > span > input",
+                ".cms-mango-popup > div > div:nth-child(2) > div > div:nth-child(2) > div > div:nth-child(3) > div > div:nth-child(3) > div > span > input",
+                "div > div > div > div > div > div > input"
             ])
         })
 
@@ -317,8 +466,17 @@ async function createAccount({
                     const element = document.querySelector(path) as any;
                     if (!element) {
                         console.log(`${path} not found`);
-                        resolve(false);
+                        return resolve(false);
                     }
+                    const {top, left, width, height} = element?.getBoundingClientRect() as DOMRect
+                    const clickEvt = new MouseEvent('click', {
+                        clientX: left + width / 2,
+                        clientY: top + height / 2,
+                        bubbles: true,
+                        cancelable: false,
+                        composed: true
+                    })
+                    element?.dispatchEvent(clickEvt);
                     element?.click();
                     console.log(`${path} found`);
                     resolve(true);
@@ -330,7 +488,7 @@ async function createAccount({
                     const element = document.querySelector(path) as any;
                     if (!element) {
                         console.log(`${path} not found`);
-                        resolve(false);
+                        return resolve(false);
                     }
                     Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set?.call(element, value);
                     for (let i = 0; i < value.length; i++) {
@@ -346,7 +504,9 @@ async function createAccount({
 
             await Promise.all([
                 [
-                    "div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div > div > div.e8siic_ICXmLcAr12pgU > div:nth-child(3) > section > div > div > span > input"
+                    "div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div > div > div.e8siic_ICXmLcAr12pgU > div:nth-child(3) > section > div > div > span > input",
+                    ".cms-mango-popup > div > div:nth-child(2) > div > div:nth-child(2) > div > div:nth-child(3) > div > div:nth-child(3) > div > span > input",
+                    "div > div > div > div > div > div > input"
                 ].map(async (path) => {
                     return await setValueOnElement(path, "10")
                 })
@@ -354,7 +514,9 @@ async function createAccount({
 
             await Promise.all([
                 [
-                    "div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div > div > div > button"
+                    "div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div > div > div > button",
+                    ".cms-mango-popup > div > div:nth-child(2) > div > div:nth-child(2) > div > div:nth-child(3) > div:nth-child(3) > button",
+                    "div > div > div > button"
                 ].map(async (path) => {
                     return await clickOnElement(path)
                 })
