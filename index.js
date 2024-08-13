@@ -4,25 +4,30 @@ const puppeteer_1 = require("puppeteer");
 const faker_1 = require("@faker-js/faker");
 const fs = require("fs");
 const user_agents_1 = require("./user-agents");
-const proxyChain = require('proxy-chain');
-process.on('uncaughtException', async () => {
+const node_process_1 = require("node:process");
+const proxyChain = require("proxy-chain");
+const readline = require("node:readline/promises");
+const rl = readline.createInterface({
+    input: node_process_1.stdin,
+    output: node_process_1.stdout
+});
+process.on("uncaughtException", async () => {
     await Promise.all(browsers.map(async (b) => b === null || b === void 0 ? void 0 : b.close()));
 });
-process.on('SIGINT', async () => {
+process.on("SIGINT", async () => {
     await Promise.all(browsers.map(async (b) => b === null || b === void 0 ? void 0 : b.close()));
 });
 const browsers = [];
 (async () => {
-    const { link, proxy, quantidade_contas, senha_contas, modelo_plataforma, preencher_nome } = JSON.parse(Buffer.from(fs.readFileSync("./configs/config.json")).toString('utf8'));
+    const { link, proxy, proxy_dados, quantidade_contas, senha_contas, } = JSON.parse(Buffer.from(fs.readFileSync("./configs/config.json")).toString("utf8"));
+    const isUseNormalProxy = await rl.question("Deseja usar proxy normal? (s/n): ");
     const promises = [];
     for (let i = 0; i < parseInt(quantidade_contas); i++) {
         promises.push(createAccount({
             link,
-            proxy,
+            proxy: isUseNormalProxy === 's' ? proxy : proxy_dados,
             accountsPassword: senha_contas,
-            platformModel: modelo_plataforma,
-            isWaitForName: preencher_nome,
-            index: i
+            index: i,
         }));
     }
     await Promise.allSettled(promises);
@@ -33,10 +38,7 @@ function getWindowPosition(index, step, resetValue) {
 function getWindowPositionYByIndexMultiple(index) {
     return index % 3 === 0 ? 0 : 500;
 }
-async function createAccount({ link, proxy, accountsPassword, platformModel, isWaitForName, index }) {
-    var _a, _b, _c, _d;
-    const mainLink = (_d = (_c = (_a = link.replace) === null || _a === void 0 ? void 0 : (_b = _a.call(link, "https://", "")).split) === null || _c === void 0 ? void 0 : _c.call(_b, "/")) === null || _d === void 0 ? void 0 : _d[0];
-    const depositLink = `https://${mainLink}/deposit`;
+async function createAccount({ link, proxy, accountsPassword, index, }) {
     const step = 350;
     const resetValue = 1750;
     const show4WindowsSideBySide = `--window-position=${getWindowPosition(index, step, resetValue)},${getWindowPositionYByIndexMultiple(index)}`;
@@ -47,18 +49,18 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, isW
         ignoreDefaultArgs: true,
         args: [
             `--proxy-server=${await proxyChain.anonymizeProxy(`http://${proxy}`)}`,
-            '--incognito',
-            '--verbose',
-            '--disable-dev-shm-usage',
-            '--disable-xss-auditor',
-            '--no-zygote',
-            '--disable-breakpad',
-            '--disable-hang-monitor',
-            '--disable-dev-profile',
-            '--disable-infobars',
+            "--incognito",
+            "--verbose",
+            "--disable-dev-shm-usage",
+            "--disable-xss-auditor",
+            "--no-zygote",
+            "--disable-breakpad",
+            "--disable-hang-monitor",
+            "--disable-dev-profile",
+            "--disable-infobars",
             show4WindowsSideBySide,
-            '--window-size=250,600',
-            `--user-agent=${userAgent}`
+            "--window-size=250,750",
+            `--user-agent=${userAgent}`,
         ],
     });
     try {
@@ -67,93 +69,392 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, isW
         page.setDefaultNavigationTimeout(0);
         page.setDefaultTimeout(0);
         await page.goto(link, {
-            waitUntil: ['networkidle0', 'domcontentloaded', 'load']
+            waitUntil: ["networkidle0", "domcontentloaded", "load"],
         });
-        const username = `${faker_1.faker.person.firstName().toLowerCase().substring(0, 8)}${faker_1.faker.person.lastName().toLowerCase().substring(0, 8).replace('-', '')}`;
-        if (platformModel === '1') {
-            const usernameInput = "form > div:nth-child(1) > div > div > div > input";
-            const passwordInput = "form > div:nth-child(2) > div > div > div > input";
-            const confirmPasswordInput = "form > div:nth-child(4) > div > div > div > input";
-            await page.waitForSelector(usernameInput);
-            await page.waitForSelector(passwordInput);
-            await page.waitForSelector(confirmPasswordInput);
-            if (!isWaitForName) {
-                await page.type(usernameInput, username);
-            }
-            await page.type(passwordInput, accountsPassword);
-            await page.type(confirmPasswordInput, accountsPassword);
-            await page.waitForFunction((usernameInput, isWaitForName) => {
-                var _a, _b;
-                if (!isWaitForName) {
-                    return true;
-                }
-                return ((_b = (_a = document.querySelector(usernameInput)) === null || _a === void 0 ? void 0 : _a.value) === null || _b === void 0 ? void 0 : _b.length) > 6;
-            }, {
-                polling: 300
-            }, usernameInput, isWaitForName);
-            const registerButton = "form > div:nth-child(6) > button";
-            await page.waitForSelector(registerButton);
-            if (!isWaitForName) {
-                await page.click(registerButton);
-            }
-            await page.evaluate(async (registerButton) => {
-                return await new Promise(resolve => {
-                    var _a;
-                    (_a = document.querySelector(registerButton)) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
-                        resolve(true);
+        const username = `${faker_1.faker.person
+            .firstName()
+            .toLowerCase()
+            .substring(0, 8)}${faker_1.faker.person
+            .lastName()
+            .toLowerCase()
+            .substring(0, 8)
+            .replace("-", "")}`;
+        await page.waitForFunction(async () => {
+            function clickOnElement(path) {
+                return new Promise(async (resolve) => {
+                    const element = document.querySelector(path);
+                    if (!element) {
+                        console.log(`${path} not found`);
+                        return resolve(false);
+                    }
+                    const { top, left, width, height } = element === null || element === void 0 ? void 0 : element.getBoundingClientRect();
+                    const clickEvt = new MouseEvent('click', {
+                        clientX: left + width / 2,
+                        clientY: top + height / 2,
+                        bubbles: true,
+                        cancelable: false,
+                        composed: true
                     });
+                    element === null || element === void 0 ? void 0 : element.dispatchEvent(clickEvt);
+                    element === null || element === void 0 ? void 0 : element.click();
+                    console.log(`${path} found`);
+                    resolve(true);
                 });
-            }, registerButton);
-            await page.evaluate(async () => await new Promise(resolve => setTimeout(resolve, 2000)));
-            await page.goto(depositLink);
-            const depositAmountElement = 'div > div > div > div > div > div > div > input';
-            await page.waitForSelector(depositAmountElement);
-            await page.type(depositAmountElement, '10');
-            const depositButton = "div > div > div > div > button";
-            await page.waitForSelector(depositButton);
-            await page.click(depositButton);
-        }
-        else if (platformModel === '2') {
-            await page.waitForSelector("#js_header > div > div > div > div:nth-child(2)");
-            await clickOnElement(page, "#js_header > div > div > div > div:nth-child(2)");
-            const usernameInput = "form > div:nth-child(1) > div > div > div > div > input";
-            const passwordInput = "form > div:nth-child(2) > div > div > div > div > input";
-            const confirmPasswordInput = "form > div:nth-child(4) > div > div > div > div > input";
-            const nameInput = "form > div:nth-child(5) > div > div > div > div > input";
-            await page.evaluate(async () => await new Promise(resolve => setTimeout(resolve, 2000)));
-            if (!isWaitForName) {
-                await page.type(usernameInput, username);
             }
-            await page.type(passwordInput, accountsPassword);
-            await page.type(confirmPasswordInput, accountsPassword);
-            await page.type(nameInput, faker_1.faker.person.fullName());
-            await page.waitForFunction((usernameInput, isWaitForName) => {
-                var _a, _b;
-                if (!isWaitForName) {
-                    return true;
-                }
-                return ((_b = (_a = document.querySelector(usernameInput)) === null || _a === void 0 ? void 0 : _a.value) === null || _b === void 0 ? void 0 : _b.length) > 6;
-            }, {
-                polling: 300
-            }, usernameInput, isWaitForName);
-            const registerButton = "#js_login > div > div > div:nth-child(3) > button";
-            if (!isWaitForName) {
-                await clickWithMouseOnElement(page, registerButton);
-            }
-            await page.evaluate(async (registerButton) => {
-                return await new Promise(resolve => {
-                    var _a;
-                    (_a = document.querySelector(registerButton)) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
+            await Promise.all(["div.right-content-wrapper > div.content-wrapper > div > div.v--modal-overlay > div > div.v--modal-box.v--modal > div > div.tcg_modal_close"].map(async (path) => {
+                return await clickOnElement(path);
+            }));
+            await Promise.all(["#mc-animate-container > div > div.page_container.home-container > div.popup_container_v2.show-popup > div > div.popup_content > div.am-navbar-title.close-btn > svg"].map(async (path) => {
+                return await clickOnElement(path);
+            }));
+            await Promise.all(["div.right-content-wrapper > div.header > div > div > div.right-wrap > div.hd_login > div:nth-child(2) > span"].map(async (path) => {
+                return await clickOnElement(path);
+            }));
+            return true;
+        });
+        await page.waitForFunction(async () => {
+            function isElementRendered(paths) {
+                return new Promise(resolve => {
+                    var _a, _b;
+                    const element = (_a = paths === null || paths === void 0 ? void 0 : paths.map(path => document.querySelector(path))) === null || _a === void 0 ? void 0 : _a.find(Boolean);
+                    const isAllUndefined = (_b = paths === null || paths === void 0 ? void 0 : paths.map(path => document.querySelector(path))) === null || _b === void 0 ? void 0 : _b.every(p => !p);
+                    if (isAllUndefined) {
                         resolve(true);
-                    });
+                    }
+                    if (!element) {
+                        console.log(`${element} not found`);
+                        return resolve(false);
+                    }
+                    console.log(`${element} found`);
+                    resolve(true);
                 });
-            }, registerButton);
-            await page.evaluate(async () => await new Promise(resolve => setTimeout(resolve, 2000)));
-            await page.reload();
-            await clickWithMouseOnElement(page, ".cms-mango-popup > div > div > div > div> div > div:nth-child(3)");
-            await clickWithMouseOnElement(page, ".van-popup > div:nth-child(2) > div > div:nth-child(2) > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(1)");
-            await clickOnElement(page, ".van-popup > div:nth-child(2) > div > div:nth-child(2) > div > div:nth-child(3) > div:nth-child(3) > button");
-        }
+            }
+            return await isElementRendered([
+                "div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div > div.login-register-body",
+                "div.right-content-wrapper > div.header > div.v--modal-overlay > div > div.v--modal-box.v--modal",
+                "body > div > div > div > div > div",
+                "#accountRegisterModal"
+            ]);
+        });
+        await page.waitForFunction(async (username, accountsPassword) => {
+            function clickOnElement(path) {
+                return new Promise(async (resolve) => {
+                    const element = document.querySelector(path);
+                    if (!element) {
+                        console.log(`${path} not found`);
+                        return resolve(false);
+                    }
+                    const { top, left, width, height } = element === null || element === void 0 ? void 0 : element.getBoundingClientRect();
+                    const clickEvt = new MouseEvent('click', {
+                        clientX: left + width / 2,
+                        clientY: top + height / 2,
+                        bubbles: true,
+                        cancelable: false,
+                        composed: true
+                    });
+                    element === null || element === void 0 ? void 0 : element.dispatchEvent(clickEvt);
+                    element === null || element === void 0 ? void 0 : element.click();
+                    console.log(`${path} found`);
+                    resolve(true);
+                });
+            }
+            function setValueOnElement(path, value) {
+                return new Promise(async (resolve) => {
+                    var _a, _b;
+                    const element = document.querySelector(path);
+                    if (!element) {
+                        console.log(`${path} not found`);
+                        return resolve(false);
+                    }
+                    (_b = (_a = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')) === null || _a === void 0 ? void 0 : _a.set) === null || _b === void 0 ? void 0 : _b.call(element, value);
+                    for (let i = 0; i < value.length; i++) {
+                        element.dispatchEvent(new Event("input", { bubbles: true, cancelable: false, composed: true }));
+                        element.dispatchEvent(new Event("change", { bubbles: true, cancelable: false, composed: true }));
+                        element.dispatchEvent(new Event("blur", { bubbles: true, cancelable: false, composed: true }));
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                    console.log(`${path} found`);
+                    resolve(true);
+                });
+            }
+            await Promise.all([
+                [
+                    "form > div > div:nth-child(2) > div > div > div > span > div > div > div > ul > li > div > input",
+                    "form > div:nth-child(1) > div:nth-child(1) > div > input",
+                    "form > div:nth-child(1) > div > div > div > input",
+                    "form > div:nth-child(1) > div > div > div > div > input"
+                ].map(async (path) => {
+                    return await setValueOnElement(path, username);
+                }),
+                [
+                    "form > div > div:nth-child(4) > div > div > div > span > span > input",
+                    "form > div:nth-child(1) > div:nth-child(2) > div > input",
+                    "form > div:nth-child(2) > div > div > div > input",
+                    "form > div:nth-child(2) > div > div > div > div > input"
+                ].map(async (path) => {
+                    return await setValueOnElement(path, accountsPassword);
+                }),
+                [
+                    "form > div > div:nth-child(6) > div > div > div > span > span > input",
+                    "form > div:nth-child(1) > div:nth-child(3) > div > input",
+                    "form > div:nth-child(4) > div > div > div > input",
+                    "form > div:nth-child(4) > div > div > div > div > input"
+                ].map(async (path) => {
+                    return await setValueOnElement(path, accountsPassword);
+                })
+            ]);
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            await Promise.all([
+                [
+                    "div.right-content-wrapper > div.header > div.v--modal-overlay > div > div.v--modal-box.v--modal > div > div.tcg_modal_body > div > div.register_wrapper.register-modal > div > div.form_container > form > div.form_item.reg-btn-wrap > button",
+                    "div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div > div.login-register-body > div:nth-child(4) > div:nth-child(2) > button",
+                    "form > div:nth-child(6) > button",
+                    "#js_login > div > div > div:nth-child(3) > button"
+                ].map(async (path) => {
+                    return await clickOnElement(path);
+                })
+            ]);
+            return true;
+        }, {}, username, accountsPassword);
+        await page.waitForFunction(async () => {
+            function isElementRendered(paths) {
+                return new Promise(resolve => {
+                    var _a, _b;
+                    const element = (_a = paths === null || paths === void 0 ? void 0 : paths.map(path => document.querySelector(path))) === null || _a === void 0 ? void 0 : _a.find(Boolean);
+                    const isAllUndefined = (_b = paths === null || paths === void 0 ? void 0 : paths.map(path => document.querySelector(path))) === null || _b === void 0 ? void 0 : _b.every(p => !p);
+                    if (isAllUndefined) {
+                        resolve(true);
+                    }
+                    if (!element) {
+                        console.log(`${element} not found`);
+                        return resolve(false);
+                    }
+                    console.log(`${element} found`);
+                    resolve(true);
+                });
+            }
+            return await isElementRendered([
+                "body > div._modalBox_3bzvl_3 > div > div > div._delete_re3qb_19 > img",
+                "div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary",
+                ".cms-mango-popup > div > div > div > div > div > div:nth-child(3)"
+            ]);
+        });
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        await page.waitForFunction(async () => {
+            function clickOnElement(path) {
+                return new Promise(async (resolve) => {
+                    const element = document.querySelector(path);
+                    if (!element) {
+                        console.log(`${path} not found`);
+                        return resolve(false);
+                    }
+                    const { top, left, width, height } = element === null || element === void 0 ? void 0 : element.getBoundingClientRect();
+                    const clickEvt = new MouseEvent('click', {
+                        clientX: left + width / 2,
+                        clientY: top + height / 2,
+                        bubbles: true,
+                        cancelable: false,
+                        composed: true
+                    });
+                    element === null || element === void 0 ? void 0 : element.dispatchEvent(clickEvt);
+                    element === null || element === void 0 ? void 0 : element.click();
+                    console.log(`${path} found`);
+                    resolve(true);
+                });
+            }
+            await Promise.all([
+                [
+                    "body > div._modalBox_3bzvl_3 > div > div > div._delete_re3qb_19 > img",
+                    "div.ant-modal-wrap.ant-modal-centered.ant-modal-confirm-centered > div > div.ant-modal-content > div > div > div.ant-modal-confirm-btns > button.ant-btn.ant-btn-primary",
+                    ".cms-mango-popup > div > div > div > div > div > div:nth-child(3)"
+                ].map(async (path) => {
+                    return await clickOnElement(path);
+                })
+            ]);
+            return true;
+        });
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        await page.waitForFunction(async () => {
+            function clickOnElement(path) {
+                return new Promise(async (resolve) => {
+                    const element = document.querySelector(path);
+                    if (!element) {
+                        console.log(`${path} not found`);
+                        return resolve(false);
+                    }
+                    const { top, left, width, height } = element === null || element === void 0 ? void 0 : element.getBoundingClientRect();
+                    const clickEvt = new MouseEvent('click', {
+                        clientX: left + width / 2,
+                        clientY: top + height / 2,
+                        bubbles: true,
+                        cancelable: false,
+                        composed: true
+                    });
+                    element === null || element === void 0 ? void 0 : element.dispatchEvent(clickEvt);
+                    element === null || element === void 0 ? void 0 : element.click();
+                    console.log(`${path} found`);
+                    resolve(true);
+                });
+            }
+            await Promise.all([
+                [
+                    ".cms-mango-popup:last-child > div > div > div > div > div > div > div:nth-child(3) > span"
+                ].map(async (path) => {
+                    return await clickOnElement(path);
+                })
+            ]);
+            return true;
+        });
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        await page.waitForFunction(async () => {
+            function clickOnElement(path) {
+                return new Promise(async (resolve) => {
+                    const element = document.querySelector(path);
+                    if (!element) {
+                        console.log(`${path} not found`);
+                        return resolve(false);
+                    }
+                    const { top, left, width, height } = element === null || element === void 0 ? void 0 : element.getBoundingClientRect();
+                    const clickEvt = new MouseEvent('click', {
+                        clientX: left + width / 2,
+                        clientY: top + height / 2,
+                        bubbles: true,
+                        cancelable: false,
+                        composed: true
+                    });
+                    element === null || element === void 0 ? void 0 : element.dispatchEvent(clickEvt);
+                    element === null || element === void 0 ? void 0 : element.click();
+                    console.log(`${path} found`);
+                    resolve(true);
+                });
+            }
+            await Promise.all([
+                [
+                    ".cms-mango-popup:last-child > div > div > div > div > div:nth-child(2)"
+                ].map(async (path) => {
+                    return await clickOnElement(path);
+                })
+            ]);
+            return true;
+        });
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        await page.waitForFunction(async () => {
+            function clickOnElement(path) {
+                return new Promise(async (resolve) => {
+                    const element = document.querySelector(path);
+                    if (!element) {
+                        console.log(`${path} not found`);
+                        return resolve(false);
+                    }
+                    const { top, left, width, height } = element === null || element === void 0 ? void 0 : element.getBoundingClientRect();
+                    const clickEvt = new MouseEvent('click', {
+                        clientX: left + width / 2,
+                        clientY: top + height / 2,
+                        bubbles: true,
+                        cancelable: false,
+                        composed: true
+                    });
+                    element === null || element === void 0 ? void 0 : element.dispatchEvent(clickEvt);
+                    element === null || element === void 0 ? void 0 : element.click();
+                    console.log(`${path} found`);
+                    resolve(true);
+                });
+            }
+            await Promise.all([
+                [
+                    "#js_header > div > div > div > div > div",
+                    "div > div > div > div > div > div > div:nth-child(2) > div:nth-child(2) > div"
+                ].map(async (path) => {
+                    return await clickOnElement(path);
+                })
+            ]);
+            return true;
+        });
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        await page.waitForFunction(async () => {
+            function isElementRendered(paths) {
+                return new Promise(resolve => {
+                    var _a, _b;
+                    const element = (_a = paths === null || paths === void 0 ? void 0 : paths.map(path => document.querySelector(path))) === null || _a === void 0 ? void 0 : _a.find(Boolean);
+                    const isAllUndefined = (_b = paths === null || paths === void 0 ? void 0 : paths.map(path => document.querySelector(path))) === null || _b === void 0 ? void 0 : _b.every(p => !p);
+                    if (isAllUndefined) {
+                        resolve(true);
+                    }
+                    if (!element) {
+                        console.log(`${element} not found`);
+                        return resolve(false);
+                    }
+                    console.log(`${element} found`);
+                    resolve(true);
+                });
+            }
+            return await isElementRendered([
+                "div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div > div > div.e8siic_ICXmLcAr12pgU > div:nth-child(3) > section > div > div > span > input",
+                ".cms-mango-popup > div > div:nth-child(2) > div > div:nth-child(2) > div > div:nth-child(3) > div > div:nth-child(3) > div > span > input",
+                "div > div > div > div > div > div > input"
+            ]);
+        });
+        await page.waitForFunction(async () => {
+            function clickOnElement(path) {
+                return new Promise(async (resolve) => {
+                    const element = document.querySelector(path);
+                    if (!element) {
+                        console.log(`${path} not found`);
+                        return resolve(false);
+                    }
+                    const { top, left, width, height } = element === null || element === void 0 ? void 0 : element.getBoundingClientRect();
+                    const clickEvt = new MouseEvent('click', {
+                        clientX: left + width / 2,
+                        clientY: top + height / 2,
+                        bubbles: true,
+                        cancelable: false,
+                        composed: true
+                    });
+                    element === null || element === void 0 ? void 0 : element.dispatchEvent(clickEvt);
+                    element === null || element === void 0 ? void 0 : element.click();
+                    console.log(`${path} found`);
+                    resolve(true);
+                });
+            }
+            function setValueOnElement(path, value) {
+                return new Promise(async (resolve) => {
+                    var _a, _b;
+                    const element = document.querySelector(path);
+                    if (!element) {
+                        console.log(`${path} not found`);
+                        return resolve(false);
+                    }
+                    (_b = (_a = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')) === null || _a === void 0 ? void 0 : _a.set) === null || _b === void 0 ? void 0 : _b.call(element, value);
+                    for (let i = 0; i < value.length; i++) {
+                        element.dispatchEvent(new Event("input", { bubbles: true, cancelable: false, composed: true }));
+                        element.dispatchEvent(new Event("change", { bubbles: true, cancelable: false, composed: true }));
+                        element.dispatchEvent(new Event("blur", { bubbles: true, cancelable: false, composed: true }));
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                    console.log(`${path} found`);
+                    resolve(true);
+                });
+            }
+            await Promise.all([
+                [
+                    "div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div > div > div.e8siic_ICXmLcAr12pgU > div:nth-child(3) > section > div > div > span > input",
+                    ".cms-mango-popup > div > div:nth-child(2) > div > div:nth-child(2) > div > div:nth-child(3) > div > div:nth-child(3) > div > span > input",
+                    "div > div > div > div > div > div > input"
+                ].map(async (path) => {
+                    return await setValueOnElement(path, "10");
+                })
+            ]);
+            await Promise.all([
+                [
+                    "div.ant-modal-wrap.ant-modal-centered > div > div.ant-modal-content > div.ant-modal-body > div > section > section > div.common-tabs-content > section > div > div > div > div > div > button",
+                    ".cms-mango-popup > div > div:nth-child(2) > div > div:nth-child(2) > div > div:nth-child(3) > div:nth-child(3) > button",
+                    "div > div > div > button"
+                ].map(async (path) => {
+                    return await clickOnElement(path);
+                })
+            ]);
+            return true;
+        });
         browsers.push(browser);
         await neverStop();
     }
@@ -161,28 +462,10 @@ async function createAccount({ link, proxy, accountsPassword, platformModel, isW
         console.log(e);
     }
 }
-async function clickWithMouseOnElement(page, path) {
-    const element = await page.waitForSelector(path, {
-        timeout: 0
-    });
-    const rect = await page.evaluate(el => {
-        const { top, left, width, height } = el === null || el === void 0 ? void 0 : el.getBoundingClientRect();
-        return { top, left, width, height };
-    }, element);
-    await page.mouse.click((rect === null || rect === void 0 ? void 0 : rect.left) + (rect === null || rect === void 0 ? void 0 : rect.width) / 2, (rect === null || rect === void 0 ? void 0 : rect.top) + (rect === null || rect === void 0 ? void 0 : rect.height) / 2);
-}
 async function neverStop() {
     return new Promise(() => {
         setInterval(() => {
             console.log();
         }, 1000);
     });
-}
-async function clickOnElement(page, path) {
-    await page.evaluate(async (path) => await new Promise(resolve => {
-        const element = document.querySelector(path);
-        setInterval(() => {
-            resolve(element === null || element === void 0 ? void 0 : element.click());
-        }, 1000);
-    }), path);
 }

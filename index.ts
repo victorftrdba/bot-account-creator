@@ -2,8 +2,15 @@ import puppeteer, {Browser} from "puppeteer";
 import {faker} from "@faker-js/faker";
 import * as fs from "fs";
 import {userAgents} from "./user-agents";
+import {stdin as input, stdout as output} from 'node:process';
+import proxyChain = require("proxy-chain");
 
-const proxyChain = require("proxy-chain");
+import readline = require('node:readline/promises');
+
+const rl = readline.createInterface({
+    input,
+    output
+})
 
 process.on("uncaughtException", async () => {
     await Promise.all(browsers.map(async (b) => b?.close()));
@@ -19,18 +26,21 @@ const browsers: Browser[] = [];
     const {
         link,
         proxy,
+        proxy_dados,
         quantidade_contas,
         senha_contas,
     } = JSON.parse(
         Buffer.from(fs.readFileSync("./configs/config.json")).toString("utf8")
     );
 
+    const isUseNormalProxy = await rl.question("Deseja usar proxy normal? (s/n): ");
+
     const promises = [];
     for (let i = 0; i < parseInt(quantidade_contas); i++) {
         promises.push(
             createAccount({
                 link,
-                proxy,
+                proxy: isUseNormalProxy === 's' ? proxy : proxy_dados,
                 accountsPassword: senha_contas,
                 index: i,
             })
