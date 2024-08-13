@@ -48,7 +48,7 @@ async function createAccount({ link, proxy, accountsPassword, index, }) {
         defaultViewport: null,
         ignoreDefaultArgs: true,
         args: [
-            `--proxy-server=${await proxyChain.anonymizeProxy(`http://${proxy}`)}`,
+            (proxy === null || proxy === void 0 ? void 0 : proxy.length) ? `--proxy-server=${await proxyChain.anonymizeProxy(`http://${proxy}`)}` : '',
             "--incognito",
             "--verbose",
             "--disable-dev-shm-usage",
