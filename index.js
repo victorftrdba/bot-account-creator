@@ -19,13 +19,13 @@ process.on("SIGINT", async () => {
 });
 const browsers = [];
 (async () => {
-    const { link, proxy, proxy_dados, quantidade_contas, senha_contas, } = JSON.parse(Buffer.from(fs.readFileSync("./configs/config.json")).toString("utf8"));
+    const { link, proxy, quantidade_contas, senha_contas, } = JSON.parse(Buffer.from(fs.readFileSync("./configs/config.json")).toString("utf8"));
     const isUseNormalProxy = await rl.question("Deseja usar proxy normal? (s/n): ");
     const promises = [];
     for (let i = 0; i < parseInt(quantidade_contas); i++) {
         promises.push(createAccount({
             link,
-            proxy: isUseNormalProxy === 's' ? proxy : proxy_dados,
+            proxy: isUseNormalProxy === 's' ? proxy : '',
             accountsPassword: senha_contas,
             index: i,
         }));
