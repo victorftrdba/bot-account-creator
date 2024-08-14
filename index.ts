@@ -26,6 +26,7 @@ const browsers: Browser[] = [];
     const {
         link,
         proxy,
+        proxy_dados,
         quantidade_contas,
         senha_contas,
     } = JSON.parse(
@@ -39,7 +40,7 @@ const browsers: Browser[] = [];
         promises.push(
             createAccount({
                 link,
-                proxy: isUseNormalProxy === 's' ? proxy : '',
+                proxy: isUseNormalProxy === 's' ? proxy : proxy_dados,
                 accountsPassword: senha_contas,
                 index: i,
             })
